@@ -33,6 +33,7 @@ namespace explode
       u.words = &x;
       read (u.bytes, sizeof (T));
     }
+
   private:
     input (const input&);
     input& operator = (const input&);

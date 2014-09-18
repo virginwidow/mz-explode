@@ -13,6 +13,7 @@ add_definitions ("-g")
 set (modules
   explode
   unpklite
+  unlzexe
 )
 
 foreach (module ${modules})

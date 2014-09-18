@@ -517,9 +517,7 @@ namespace explode
     std::vector <uint8_t> code;
     std::size_t code_pos = 0;
     
-    bit_reader f (m_file, m_header_length);
-
-    f.seek (m_data_offset);
+    
 
     if ((m_h_pklite_info & 0x0FFF) == 0x114)
       {
@@ -527,7 +525,9 @@ namespace explode
       }
     else
       {
-	
+	bit_reader f (m_file, m_header_length);
+
+	f.seek (m_data_offset);
 
 	adjust_length_code_fn adjust_length_code = 
 	  ((m_h_pklite_info & 0x2000) == 0) ? adjust_length_code_2000 : adjust_length_code_n2000;

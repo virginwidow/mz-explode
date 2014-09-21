@@ -1,0 +1,90 @@
+36f0:
+	code = f.get_bit ();
+	
+3767:
+	if (code == 0)
+	{
+		out [bx] = f.get_byte ();
+		if (h_pklite_info & 0x1000 != 0)
+		{
+			// 3793
+			out [bx] = out [bx] ^ f.counter;
+		}
+		bx++;
+	}
+	else
+	{
+// 37bb
+		code = 0;
+		if (h_pklite_info & 0x2000 != 0)
+		{
+			goto 3aa2;
+		}
+		goto 3f33; // TODO
+// 37d1:
+		code = (code << 1) | f.get_bit ();
+		if (code == 2 || code == 3)
+		{
+			goto 3aa5;
+		}
+		
+		code = (code << 1) | f.get_bit ();
+		if (code == 0)
+		{
+			code = 4;
+			goto 3aa5;
+		}
+		code = (code << 1) | f.get_bit ();
+		if (code == 2)
+		{
+			code = 0xFFFC;
+			goto 3aa5;
+		}
+		if (code == 3)
+		{
+			code = 1;
+			goto 3aa5;
+		}
+		if (code == 4)
+		{
+			code = 5
+			goto 3aa5
+		}
+		if (code == 5)
+		{
+			code = 6
+			goto 3aa5
+		}
+		
+		if (code == 6)
+		{
+			code = read_byte () + 0xA
+			if (code == 0x109)
+			{
+				code = 0xFFFF;
+			}
+			goto 3aa5;
+		}
+		code = (code << 1) | f.get_bit ();
+		if (code == 0xE)
+		{
+			code = 7
+			goto 3aa5	
+		}
+		code = (code << 1) | f.get_bit ();
+		if (code == 0x1e)
+		{
+			code = 8
+			goto 3aa5	
+		}
+		if (code == 0x1f)
+		{
+			code = 9
+			goto 3aa5;
+		}
+3a84:
+		throw "bad length code"
+3aa5:
+	
+				
+	}

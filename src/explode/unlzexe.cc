@@ -8,7 +8,7 @@
 
 static void build_rellocs_90 (explode::input& file, std::vector <uint32_t>& rellocs)
 {
-  uint16_t seg;
+  uint16_t seg = 0;
   do
     {
       uint16_t t;
@@ -87,7 +87,7 @@ namespace explode
 	    throw decoder_error ("Unsuported version");
 	  }
       }
-    const offset_type header_pos = (inp [exe_file::HEADER_SIZE_PARA] + inp [exe_file::INITIAL_CS] << 4);
+    const offset_type header_pos = (inp [exe_file::HEADER_SIZE_PARA] + (inp [exe_file::INITIAL_CS] << 4));
     m_file.seek (header_pos);
     union
     {
@@ -137,6 +137,6 @@ namespace explode
 	m_file.read (b);
 	oexe.extra_header ().push_back (b);
       }
-   
+	return 0;
   }
 } // ns explode

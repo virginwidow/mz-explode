@@ -32,7 +32,7 @@ namespace explode
     u.words = m_header;
     m_file.read (u.bytes, sizeof (uint16_t)*MAX_HEADER_VAL);
 
-    if ((m_header[SIGNATURE] != MSDOS_MAGIC) || (m_header[SIGNATURE] != MSDOS_MAGIC_1))
+    if ((m_header[SIGNATURE] != MSDOS_MAGIC) && (m_header[SIGNATURE] != MSDOS_MAGIC_1))
       {
 	throw exefile_error ();
       }
@@ -129,7 +129,7 @@ namespace explode
       {
 	return false;
       }
-    const offset_type entry = (m_header [HEADER_SIZE_PARA] + m_header [INITIAL_CS] << 4) + m_header [INITIAL_IP];
+    const offset_type entry = (m_header [HEADER_SIZE_PARA] + (m_header [INITIAL_CS] << 4)) + m_header [INITIAL_IP];
     m_file.seek (entry);
     m_file.read ((char*)sigbuff, sizeof (sigbuff));
     if (std::memcmp (sigbuff, sig90, sizeof (sig90)) == 0)

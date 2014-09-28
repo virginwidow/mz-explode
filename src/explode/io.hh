@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <cstddef>
 #include <stdint.h>
+#include <vector>
 
 #include <sys/types.h>
 
@@ -85,6 +86,21 @@ namespace explode
     bool m_owner;
     FILE* m_file;
   };
+  // ============================================================
+  class inmem_input : public input
+  {
+  public:
+	  inmem_input(const unsigned char* data, std::size_t size);
+	  
+	  virtual void read(char* buffer, std::size_t size);
+	  virtual offset_type tell();
+	  virtual offset_type bytes_remains();
+	  virtual void seek(offset_type offset);
+  private:
+	  const unsigned char* m_data;
+	  const std::size_t    m_size;
+	  std::size_t          m_ptr;
+  };
 
   // ============================================================
   class file_output : public output
@@ -103,7 +119,20 @@ namespace explode
     bool m_owner;
     FILE* m_file;
   };
+  // ============================================================
+  class inmem_output : public output
+  {
+  public:
+	  explicit inmem_output(std::vector <char>& out_buff);
 
+	  virtual void write(const char* buffer, std::size_t size);
+	  virtual offset_type tell();
+	  virtual void seek(offset_type offset);
+
+  private:
+	  std::vector <char>& m_buff;
+	  std::size_t m_ptr;
+  };
 } // ns explode
 
 

@@ -1,3 +1,6 @@
+#if defined(_MSC_VER)
+#define _CRT_SECURE_NO_WARNINGS
+#endif
 #include "explode/io.hh"
 #include "explode/exceptions.hh"
 
@@ -72,6 +75,42 @@ namespace explode
 	throw input_error ();
       }
   }
+  // ==============================================================
+  inmem_input::inmem_input(const unsigned char* data, std::size_t size)
+	  : m_data(data),
+	    m_size(size),
+	    m_ptr(0)
+  {
+  }
+  // -------------------------------------------------------------
+  void inmem_input::read(char* buffer, std::size_t size)
+  {
+	  if (m_ptr + size > m_size)
+	  {
+		  throw input_error();
+	  }
+	  std::memcpy(buffer, m_data + m_ptr, size);
+	  m_ptr += size;
+  }
+  // -------------------------------------------------------------
+  offset_type inmem_input::tell()
+  {
+	  return m_ptr;
+  }
+  // -------------------------------------------------------------
+  offset_type inmem_input::bytes_remains()
+  {
+	  return m_size - m_ptr;
+  }
+  // -------------------------------------------------------------
+  void inmem_input::seek(offset_type offset)
+  {
+	  if (offset >= (offset_type)m_size)
+	  {
+		  throw input_error();
+	  }
+	  m_ptr = offset;
+  }
   // =============================================================
   output::output ()
   {
@@ -129,5 +168,36 @@ namespace explode
       {
 	throw input_error ();
       }
+  }
+  // =============================================================
+  inmem_output::inmem_output(std::vector <char>& out_buff)
+	  : m_buff(out_buff),
+	    m_ptr(out_buff.size())
+  {
+
+  }
+  // -------------------------------------------------------------
+  void inmem_output::write(const char* buffer, std::size_t size)
+  {
+	  if (m_ptr + size >= m_buff.size())
+	  {
+		  m_buff.resize(m_ptr + size);
+	  }
+	  std::memcpy(&m_buff[m_ptr], buffer, size);
+	  m_ptr += size;
+  }
+  // -------------------------------------------------------------
+  offset_type inmem_output::tell()
+  {
+	  return m_ptr;
+  }
+  // -------------------------------------------------------------
+  void inmem_output::seek(offset_type offset)
+  {
+	  if (offset >= (off_t)m_buff.size())
+	  {
+		  throw input_error();
+	  }
+	  m_ptr = offset;
   }
 } // ns explode

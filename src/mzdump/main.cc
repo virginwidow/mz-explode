@@ -50,7 +50,7 @@ static void dump_exe_parameters (std::ostream& os, const explode::exe_file& head
 }
 // ===================================================================
 
-enum mode_t
+enum dump_mode_t
 {
 	eDUMP_EXTRA,
 	eDUMP_RELOC,
@@ -76,10 +76,10 @@ static void dump_extra(const explode::exe_file& header, const char* ofile, explo
 	const std::size_t sz = rellocs_offset - end_of_header;
 	input.seek(end_of_header);
 	std::vector <char> extra(sz);
-	input.read(extra.data(), sz);
+	input.read(extra);
 	explode::file_output output(ofile);
 
-	output.write(extra.data(), sz);
+	output.write(&extra[0], extra.size());
 	std::cout << "Extra information has been saved to " << ofile << " (" << sz << " bytes)" << std::endl;
 }
 // --------------------------------------------------------------------
@@ -101,10 +101,10 @@ static void dump_rellocs(const explode::exe_file& header, const char* ofile, exp
 	const std::size_t sz = end_of_mz_header - rellocs_offset;
 	input.seek(rellocs_offset);
 	std::vector <char> extra(sz);
-	input.read(extra.data(), sz);
+	input.read(extra);
 	explode::file_output output(ofile);
 
-	output.write(extra.data(), sz);
+	output.write(&extra[0], extra.size ());
 	std::cout << "Rellocations has been saved to " << ofile << " (" << sz << " bytes)" << std::endl;
 }
 // --------------------------------------------------------------------
@@ -117,10 +117,10 @@ static void dump_code(const explode::exe_file& header, const char* ofile, explod
 	const std::size_t sz = input.bytes_remains ();
 	
 	std::vector <char> extra(sz);
-	input.read(extra.data(), sz);
+	input.read(extra);
 	explode::file_output output(ofile);
 
-	output.write(extra.data(), sz);
+	output.write(&extra[0], extra.size ());
 	std::cout << "Code has been saved to " << ofile << " (" << sz << " bytes)" << std::endl;
 }
 // --------------------------------------------------------------------
@@ -137,7 +137,7 @@ int main (int argc, char* argv [])
 
   const std::string s_mode = argv[1];
 
-  mode_t mode = eDUMP_NONE;
+  dump_mode_t mode = eDUMP_NONE;
   if (s_mode == "-e") 
   {
 	  mode = eDUMP_EXTRA;

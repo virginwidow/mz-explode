@@ -51,7 +51,7 @@ static void pklite_digest(const unsigned char* data, std::size_t length, md5_dig
 
 	MD5_CTX c;
 	MD5_Init(&c);
-	MD5_Update(&c, out_buff.data (), out_buff.size ());
+	MD5_Update(&c, &out_buff[0], out_buff.size ());
 	MD5_Final(digest, &c);
 }
 
@@ -64,12 +64,12 @@ static void pklite_test(const char* test_name, const unsigned char* data, std::s
 	{
 		std::vector <char> out_buff;
 		pklite_digest(data, length, dgst, out_buff);
-		
+	/*	
 		std::ostringstream os;
 		os << "x-" << test_name;
 		explode::file_output fo(os.str().c_str());
 		fo.write(out_buff.data(), out_buff.size());
-
+*/
 		for (int n = 0; n < MD5_DIGEST_LENGTH; n++)
 		{
 			std::string h(expected + 2 * n, expected + 2 * (n + 1));

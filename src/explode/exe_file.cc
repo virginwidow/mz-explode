@@ -194,7 +194,7 @@ namespace explode
   void full_exe_file::code_put (std::size_t position, const std::vector <uint8_t>& code)
   {
     m_real_size = std::max (m_real_size, position + code.size ());
-    std::memcpy (m_code.data () + position, code.data (), code.size ());
+    std::memcpy (&m_code[position], &code[0], code.size ());
   }
   // -------------------------------------------------------------------
   void full_exe_file::code_copy (std::size_t from, std::size_t length, std::size_t to)
@@ -202,7 +202,7 @@ namespace explode
     m_real_size = std::max (m_real_size, to + length);
     if (from + length < to)
       {
-	std::memcpy (m_code.data () + to, m_code.data () + from, length);
+	std::memcpy (&m_code[to], &m_code[from], length);
       }
     else
       {
@@ -255,24 +255,24 @@ namespace explode
     out.write (h.bytes, sizeof (m_header));
     if (!m_extra_header.empty ())
       {
-	out.write ((char*)m_extra_header.data (), m_extra_header.size ());
+	out.write ((char*)&m_extra_header[0], m_extra_header.size ());
       }
     union 
     {
       const char* bytes;
       const uint32_t* words;
     } r;
-    r.words = m_rellocs.data ();
+    r.words = &m_rellocs[0];
     out.write (r.bytes, m_header [exe_file::RELLOCATION_ENTRIES]*4);
     
     const std::size_t sz = m_header [exe_file::HEADER_SIZE_PARA]*16 - out.tell ();
     if (sz)
       {
 	std::vector <char> dummy (sz, 0);
-	out.write (dummy.data (), sz);
+	out.write (&dummy[0], sz);
       }
 
-    out.write ((char*)m_code.data (), m_code.size ());
+    out.write ((char*)&m_code[0], m_code.size ());
   }
 } // ns explode
 

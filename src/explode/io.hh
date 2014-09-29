@@ -34,7 +34,24 @@ namespace explode
       u.words = &x;
       read (u.bytes, sizeof (T));
     }
+  
 
+  template <class T, class Alloc>
+  void read (std::vector <T, Alloc>& v)
+  {
+    const std::size_t n = v.size ();
+	if (n == 0)
+	{
+		return;
+	}
+  	union
+	{
+		char* bytes;
+		T*    words;
+	} u;
+	u.words = &v [0];
+	read (u.bytes, sizeof (T)*n);
+  }
   private:
     input (const input&);
     input& operator = (const input&);
@@ -52,16 +69,33 @@ namespace explode
     virtual void seek (offset_type offset) = 0;
 
     template <typename T>
-    void write (T& x)
+    void write (const T& x)
     {
       union 
       {
-	char* bytes;
-	T*    words;
+	const char* bytes;
+	const T*    words;
       } u;
       u.words = &x;
       write (u.bytes, sizeof (T));
     }
+	template <class T, class Alloc>
+	void write (const std::vector <T, Alloc>& v)
+  {
+		    const std::size_t n = v.size ();
+		    if (n == 0)
+			    {
+				        return;
+						    }
+							    union
+							    {
+										     const   char* bytes;
+										const		        T*    words;
+														    } u;
+															    u.words = &v [0];
+																    write (u.bytes, sizeof (T)*n);
+																	  }
+
   private:
     output (const output&);
     output& operator = (const output&);

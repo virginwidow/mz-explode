@@ -36,7 +36,7 @@ struct setcolour
 		_console_handle = console_handle;
 	}
 
-	setcolour(colour c)
+	explicit setcolour(colour c)
 		: _c(c), _console_handle(GetStdHandle(STD_OUTPUT_HANDLE))
 	{
 
@@ -377,7 +377,10 @@ int main(int argc, char* argv[])
 	PKLITE_TEST(150);
 	PKLITE_TEST(201);
 
-	std::cout << "Total Tests: " << total_tests << " Failed tests: " << failed_tests << std::endl;
+	const colour col = (failed_tests == 0) ? GREEN : RED;
+	
+	std::cout << "Total Tests: " << setcolour(YELLOW) << total_tests << setcolour(GRAY)
+		<< " Failed tests: " << setcolour(col) << failed_tests << setcolour(GRAY) << std::endl;
 
 	return failed_tests;
 }

@@ -13,7 +13,7 @@ namespace explode
   class unpklite
   {
   public:
-    unpklite (input_exe_file& inp);
+    explicit unpklite (input_exe_file& inp);
 
     uint32_t unpak (output_exe_file& oexe);
     

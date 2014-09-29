@@ -20,7 +20,7 @@ namespace explode
   class decoder_error : public std::runtime_error
   {
   public:
-    decoder_error (const char* msg);
+    explicit decoder_error (const char* msg);
   };
 } // ns explode
 

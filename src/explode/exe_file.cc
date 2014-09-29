@@ -235,11 +235,12 @@ namespace explode
       }
     if (!m_set [exe_file::RELLOCATION_ENTRIES])
       {
-	this->operator [] (exe_file::RELLOCATION_ENTRIES) = m_rellocs.size ();
+	this->operator [] (exe_file::RELLOCATION_ENTRIES) = (uint16_t)m_rellocs.size ();
       }
     if (!m_set [exe_file::RELLOC_OFFSET])
       {
-	this->operator [] (exe_file::RELLOC_OFFSET) = exe_file::MAX_HEADER_VAL*sizeof (uint16_t) + m_extra_header.size ();
+	this->operator [] (exe_file::RELLOC_OFFSET) = (uint16_t)(exe_file::MAX_HEADER_VAL*sizeof (uint16_t) + 
+								 m_extra_header.size ());
       }
     if (!m_set [exe_file::NUM_OF_PAGES])
       {

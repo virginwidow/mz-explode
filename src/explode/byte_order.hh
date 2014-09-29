@@ -79,7 +79,7 @@ namespace explode
   //
   inline uint16_t byte_order::flip_bytes(uint16_t value)
   {
-    return ((value >> 8) & 0x00FF) | ((value << 8) & 0xFF00);
+    return (uint16_t)(((value >> 8) & 0x00FF) | ((value << 8) & 0xFF00));
   }
 
 
@@ -161,7 +161,7 @@ namespace explode
 #endif
 
 
-#if defined(EXPLODE_ARCH_BIG_ENDIAN)
+#if defined(EXPLODE_BIG_ENDIAN)
 #define _dEXPLODE_IMPLEMENT_BYTEORDER_BIG _dEXPLODE_IMPLEMENT_BYTEORDER_NOOP
 #define _dEXPLODE_IMPLEMENT_BYTEORDER_LIT _dEXPLODE_IMPLEMENT_BYTEORDER_FLIP
 #else

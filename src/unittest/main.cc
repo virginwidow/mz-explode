@@ -198,7 +198,7 @@ namespace zkr
 struct setcolour
 {
 	const char* _code;
-	setcolour(colour c)
+	explicit setcolour(colour c)
 		: _code (" ")
 	{
 		switch (c)

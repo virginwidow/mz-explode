@@ -3,7 +3,7 @@
 
 
 #include <stdint.h>
-
+#define EXPLODE_HAVE_INT64
 namespace explode 
 {
   class byte_order

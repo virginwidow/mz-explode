@@ -12,6 +12,7 @@ set (hdr
   exe_file.hh
   unpklite.hh
   unlzexe.hh
+  byte_order.hh
 )
 
 add_library (explode STATIC ${src} ${hdr})

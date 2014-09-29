@@ -5,8 +5,9 @@
 #include "explode/exe_file.hh"
 #include "explode/io.hh"
 #include "explode/exceptions.hh"
+#include "explode/byte_order.hh"
 
-static const uint16_t MSDOS_MAGIC = 0x5A4D;
+static const uint16_t MSDOS_MAGIC   = 0x5A4D;
 static const uint16_t MSDOS_MAGIC_1 = 0x4D5A;
 
 namespace explode
@@ -31,6 +32,11 @@ namespace explode
     } u;
     u.words = m_header;
     m_file.read (u.bytes, sizeof (uint16_t)*MAX_HEADER_VAL);
+    
+    for (int i=0; i<MAX_HEADER_VAL; i++)
+      {
+	m_header [i] = byte_order::from_little_endian (m_header [i]);
+      }
 
     if ((m_header[SIGNATURE] != MSDOS_MAGIC) && (m_header[SIGNATURE] != MSDOS_MAGIC_1))
       {
@@ -50,6 +56,9 @@ namespace explode
     } u;
 
     m_file.read (u.bytes, 2*sizeof (uint16_t));
+    
+    u.words [0] = byte_order::from_little_endian (u.words [0]);
+    u.words [1] = byte_order::from_little_endian (u.words [1]);
 
     return (u.words [0] == 0x4B50) && (u.words [1] == 0x494C);
 
@@ -90,6 +99,7 @@ namespace explode
 	0xA6, 0xAC, 0x08, 0xC0, 0x74, 0x40, 0x3C, 0x01,
 	0x74, 0x05, 0x88, 0xC1, 0x41, 0xEB, 0xEA, 0x89
       };
+
     static const uint8_t sig91 [] = 
       {
 	0x06, 0x0E, 0x1F, 0x8B, 0x0E, 0x0C, 0x00, 0x8B,
@@ -193,11 +203,11 @@ namespace explode
   // -------------------------------------------------------------------
   void full_exe_file::code_put (std::size_t position, const std::vector <uint8_t>& code)
   {
-	  if (!code.empty())
-	  {
-		  m_real_size = std::max(m_real_size, position + code.size());
-		  std::memcpy(&m_code[position], &code[0], code.size());
-	  }
+    if (!code.empty())
+      {
+	m_real_size = std::max(m_real_size, position + code.size());
+	std::memcpy(&m_code[position], &code[0], code.size());
+      }
   }
   // -------------------------------------------------------------------
   void full_exe_file::code_copy (std::size_t from, std::size_t length, std::size_t to)
@@ -249,16 +259,27 @@ namespace explode
   // ------------------------------------------------------------------  
   void full_exe_file::write (output& out) const
   {
+    const uint32_t relloc_entries = ((uint32_t)m_header [exe_file::RELLOCATION_ENTRIES]) & 0xFFFF;
+    const uint32_t para_size      = ((uint32_t)m_header [exe_file::HEADER_SIZE_PARA]) & 0xFFFF;
+
+    uint16_t new_header [MAX_HEADER_VAL];
+    
+    for (int i=0; i<MAX_HEADER_VAL; i++)
+      {
+	new_header [i] = byte_order::to_little_endian (m_header [i]);
+      }
+
     union 
     {
       const char* bytes;
       const uint16_t* words;
     } h;
-    h.words = m_header;
+    h.words = new_header;
     out.write (h.bytes, sizeof (m_header));
+
     if (!m_extra_header.empty ())
       {
-	out.write ((char*)&m_extra_header[0], m_extra_header.size ());
+	out.write ((char*)&m_extra_header [0], m_extra_header.size ());
       }
     union 
     {
@@ -266,9 +287,9 @@ namespace explode
       const uint32_t* words;
     } r;
     r.words = &m_rellocs[0];
-    out.write (r.bytes, m_header [exe_file::RELLOCATION_ENTRIES]*4);
+    out.write (r.bytes, relloc_entries*4);
     
-    const std::size_t sz = m_header [exe_file::HEADER_SIZE_PARA]*16 - out.tell ();
+    const std::size_t sz = para_size*16 - out.tell ();
     if (sz)
       {
 	std::vector <char> dummy (sz, 0);

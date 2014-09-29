@@ -57,7 +57,6 @@ static void pklite_digest(const unsigned char* data, std::size_t length, md5_dig
 
 static void pklite_test(const char* test_name, const unsigned char* data, std::size_t length, const char* expected)
 {
-	
 	md5_digest dgst;
 	bool ok = true;
 	try

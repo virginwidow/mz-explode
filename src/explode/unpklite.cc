@@ -94,6 +94,12 @@ namespace
     {
     }
 
+	explicit byte_reader(explode::input& input)
+		: m_input(input),
+		m_header_length(0)
+	{
+	}
+
     void seek (uint32_t offs)
     {
       m_input.seek (m_header_length + offs);
@@ -126,6 +132,13 @@ namespace
     {
     }
     
+	explicit bit_reader(explode::input& input)
+		: byte_reader(input),
+		m_word(0),
+		m_count(0)
+	{
+	}
+
     uint16_t bit ()
     {
       if (m_count == 0)
@@ -165,7 +178,12 @@ namespace
       : byte_reader (input, header_length)
     {
     }
-    
+
+	explicit struct_reader(explode::input& input)
+		: byte_reader(input)
+	{
+	}
+
     Word operator ()  ()
     {
       return static_cast <Word>(byte ());
@@ -603,10 +621,10 @@ namespace explode
 	  }
       }
     
-    struct_reader <uint32_t> sr (m_file, m_header_length);
+    struct_reader <uint32_t> sr (m_file);
     const offset_type rellocs_pos = build_rellocs (m_h_pklite_info, sr, oexe.rellocations ()); 
 
-    struct_reader <uint16_t> f (m_file, m_header_length);
+    struct_reader <uint16_t> f (m_file);
     
     oexe [exe_file::INITIAL_SS] = f () + (f () << 8);
     oexe [exe_file::INITIAL_SP] = f () + (f () << 8);

@@ -73,28 +73,29 @@ namespace explode
     {
       union 
       {
-	const char* bytes;
-	const T*    words;
+		const char* bytes;
+		const T*    words;
       } u;
       u.words = &x;
       write (u.bytes, sizeof (T));
     }
+
 	template <class T, class Alloc>
-	void write (const std::vector <T, Alloc>& v)
-  {
-		    const std::size_t n = v.size ();
-		    if (n == 0)
-			    {
-				        return;
-						    }
-							    union
-							    {
-										     const   char* bytes;
-										const		        T*    words;
-														    } u;
-															    u.words = &v [0];
-																    write (u.bytes, sizeof (T)*n);
-																	  }
+	void write(std::vector <T, Alloc>& v)
+	{
+		const std::size_t n = v.size();
+		if (n == 0)
+		{
+			return;
+		}
+		union
+		{
+			const char* bytes;
+			const T*    words;
+		} u;
+		u.words = &v[0];
+		write(u.bytes, sizeof(T)*n);
+	}
 
   private:
     output (const output&);

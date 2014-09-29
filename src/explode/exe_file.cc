@@ -193,8 +193,11 @@ namespace explode
   // -------------------------------------------------------------------
   void full_exe_file::code_put (std::size_t position, const std::vector <uint8_t>& code)
   {
-    m_real_size = std::max (m_real_size, position + code.size ());
-    std::memcpy (&m_code[position], &code[0], code.size ());
+	  if (!code.empty())
+	  {
+		  m_real_size = std::max(m_real_size, position + code.size());
+		  std::memcpy(&m_code[position], &code[0], code.size());
+	  }
   }
   // -------------------------------------------------------------------
   void full_exe_file::code_copy (std::size_t from, std::size_t length, std::size_t to)

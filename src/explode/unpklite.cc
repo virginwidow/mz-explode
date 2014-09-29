@@ -36,25 +36,31 @@ namespace
     return false;
   }
   // =====================================================================
+
   struct register_
   {
+
+	  struct low_word
+	  {
+		  uint8_t al;
+		  uint8_t ah;
+	  };
+
+	  union reg16
+	  {
+		  uint16_t ax;
+		  low_word r8;
+	  };
+
+	  struct reg32
+	  {
+		  reg16    r16;
+		  uint16_t hi;
+	  };
     union
     {
       uint8_t bytes [4];
-      struct
-      {
-	union
-	{
-	  uint16_t ax;
-	  struct
-	  {
-	    uint8_t al;
-	    uint8_t ah;
-	  } r;
-				
-	}u;
-	uint16_t hi;
-      };
+	  reg32    r32;
       uint32_t eax;
     } data;
 
@@ -70,12 +76,12 @@ namespace
 
     operator uint16_t () const
     {
-      return data.u.ax;
+      return data.r32.r16.ax;
     }
 
     operator uint8_t () const
     {
-      return data.u.r.al;
+      return data.r32.r16.r8.al;
     }
   };
   // ---------------------------------------------------------------------
@@ -96,7 +102,7 @@ namespace
     register_ byte ()
     {
       register_ r;
-      m_input.read (r.data.u.r.al);
+	  m_input.read(r.data.r32.r16.r8.al);
       return r;
     }
     

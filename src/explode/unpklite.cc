@@ -469,6 +469,7 @@ namespace
 		  {
 		    //5013:;
 		    var_18 = f () + (f () << 8);
+			var_18 |= (var_counter << 16);
 		    rellocs.push_back (var_18);
 		    relocs_count++;
 		    has_bytes++;

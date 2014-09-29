@@ -9,11 +9,13 @@ set (UNPK_ROOT       ${CMAKE_SOURCE_DIR})
 set (UNPK_SRC        ${CMAKE_SOURCE_DIR}/src)
 
 include_directories (${UNPK_SRC})
-add_definitions ("-g")
+# add_definitions ("-g")
 set (modules
   explode
   unpklite
   unlzexe
+  mzdump
+  unittest
 )
 
 foreach (module ${modules})

@@ -33,7 +33,7 @@ static const char* digest_pklite_E_120 = "8a4b841106bae1f32c7ca45e9d41c016";
 
 typedef unsigned char md5_digest[MD5_DIGEST_LENGTH];
 
-static void pklite_digest(const unsigned char* data, std::size_t length, md5_digest& digest)
+static void pklite_digest(const unsigned char* data, std::size_t length, md5_digest& digest, std::vector<char>& out_buff)
 {
 	explode::inmem_input input(data, length);
 	explode::input_exe_file iexe(input);
@@ -44,9 +44,10 @@ static void pklite_digest(const unsigned char* data, std::size_t length, md5_dig
 	explode::unpklite decoder(iexe);
 	explode::full_exe_file fo(decoder.decomp_size());
 	decoder.unpak(fo);
-	std::vector <char> out_buff;
+	
 	explode::inmem_output out(out_buff);
 	fo.write(out);
+	
 
 	MD5_CTX c;
 	MD5_Init(&c);
@@ -61,7 +62,14 @@ static void pklite_test(const char* test_name, const unsigned char* data, std::s
 	bool ok = true;
 	try
 	{
-		pklite_digest(data, length, dgst);
+		std::vector <char> out_buff;
+		pklite_digest(data, length, dgst, out_buff);
+		
+		std::ostringstream os;
+		os << "x-" << test_name;
+		explode::file_output fo(os.str().c_str());
+		fo.write(out_buff.data(), out_buff.size());
+
 		for (int n = 0; n < MD5_DIGEST_LENGTH; n++)
 		{
 			std::string h(expected + 2 * n, expected + 2 * (n + 1));
@@ -99,8 +107,11 @@ static void pklite_test(const char* test_name, const unsigned char* data, std::s
 
 int main(int argc, char* argv[])
 {
-	PKLITE_TEST(112);
+
 	PKLITE_TEST(E_112);
+
+	PKLITE_TEST(112);
+	
 
 	PKLITE_TEST(115);
 	PKLITE_TEST(E_115);

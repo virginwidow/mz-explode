@@ -13,6 +13,7 @@ set (hdr
   unpklite.hh
   unlzexe.hh
   byte_order.hh
+  struct_reader.hh
 )
 
 add_library (explode STATIC ${src} ${hdr})

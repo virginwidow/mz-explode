@@ -67,7 +67,8 @@ namespace explode
     std::vector <uint8_t>& extra_header ();
     const std::vector <uint8_t>& extra_header () const;
 
-    virtual void code_put (std::size_t position, const std::vector <uint8_t>& code) = 0;
+	virtual void code_put(std::size_t position, const uint8_t* code, std::size_t length) = 0;
+    void code_put (std::size_t position, const std::vector <uint8_t>& code);
     virtual void code_copy (std::size_t from, std::size_t length, std::size_t to) = 0;
     
     virtual void eval_structures () = 0;
@@ -86,8 +87,8 @@ namespace explode
   {
   public:
     explicit full_exe_file (uint32_t code_size);
-    
-    virtual void code_put (std::size_t position, const std::vector <uint8_t>& code);
+	
+	virtual void code_put(std::size_t position, const uint8_t* code, std::size_t length);
     virtual void code_copy (std::size_t from, std::size_t length, std::size_t to);
     
     virtual void eval_structures ();

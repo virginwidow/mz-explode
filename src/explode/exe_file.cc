@@ -194,6 +194,15 @@ namespace explode
   {
     return m_extra_header;
   }
+  // -------------------------------------------------------------------
+  void output_exe_file::code_put(std::size_t position, const std::vector <uint8_t>& code)
+  {
+	  if (code.empty())
+	  {
+		  return;
+	  }
+	  this->code_put(position, &code[0], code.size());
+  }
   // ===================================================================
   full_exe_file::full_exe_file (uint32_t code_size)
     : m_real_size (0)
@@ -201,12 +210,12 @@ namespace explode
     m_code.resize (code_size);
   }
   // -------------------------------------------------------------------
-  void full_exe_file::code_put (std::size_t position, const std::vector <uint8_t>& code)
+  void full_exe_file::code_put(std::size_t position, const uint8_t* code, std::size_t size)
   {
-    if (!code.empty())
+    if (size > 0)
       {
-	m_real_size = std::max(m_real_size, position + code.size());
-	std::memcpy(&m_code[position], &code[0], code.size());
+		m_real_size = std::max(m_real_size, position + size);
+		std::memcpy(&m_code[position], code, size);
       }
   }
   // -------------------------------------------------------------------

@@ -47,6 +47,7 @@ namespace explode
     uint16_t m_header [eHEADER_MAX];
 
     uint32_t m_rellocs_offset;
+	uint32_t m_code_offset;
   };
 } // ns explode
 

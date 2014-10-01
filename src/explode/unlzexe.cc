@@ -10,7 +10,7 @@
 
 static void build_rellocs_90 (explode::input& file, std::vector <uint32_t>& rellocs)
 {
-  uint16_t seg = 0;
+  int16_t seg = 0;
   do
     {
       uint16_t t;
@@ -27,7 +27,7 @@ static void build_rellocs_90 (explode::input& file, std::vector <uint32_t>& rell
 	  rellocs.push_back (x);
 	}
       seg += 0x1000;
-    } while (seg != (0xF000+0x1000));
+    } while (seg != (int16_t)(0xF000+0x1000));
 }
 // ----------------------------------------------------------------
 static void build_rellocs_91 (explode::input& file, std::vector <uint32_t>& rellocs)

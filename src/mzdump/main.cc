@@ -76,10 +76,12 @@ static void dump_extra(const explode::exe_file& header, const char* ofile, explo
 	const std::size_t sz = rellocs_offset - end_of_header;
 	input.seek(end_of_header);
 	std::vector <char> extra(sz);
-	input.read(extra);
+	input.read(&extra [0], sz);
 	explode::file_output output(ofile);
-
-	output.write(&extra[0], extra.size());
+	if (!extra.empty ())
+	  {
+	    output.write(&extra[0], extra.size());
+	  }
 	std::cout << "Extra information has been saved to " << ofile << " (" << sz << " bytes)" << std::endl;
 }
 // --------------------------------------------------------------------
@@ -101,7 +103,7 @@ static void dump_rellocs(const explode::exe_file& header, const char* ofile, exp
 	const std::size_t sz = end_of_mz_header - rellocs_offset;
 	input.seek(rellocs_offset);
 	std::vector <char> extra(sz);
-	input.read(extra);
+	input.read(&extra [0], sz);
 	explode::file_output output(ofile);
 
 	output.write(&extra[0], extra.size ());
@@ -117,7 +119,7 @@ static void dump_code(const explode::exe_file& header, const char* ofile, explod
 	const std::size_t sz = input.bytes_remains ();
 	
 	std::vector <char> extra(sz);
-	input.read(extra);
+	input.read(&extra [0], sz);
 	explode::file_output output(ofile);
 
 	output.write(&extra[0], extra.size ());

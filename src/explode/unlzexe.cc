@@ -83,7 +83,7 @@ static uint32_t unpak_code(explode::output_exe_file& oexe, explode::input& input
 	  oexe.code_put(opos, data, 0x2000);
 	  opos += 0x2000;
 	  p -= 0x2000;
-	  std::memcpy(data, data + 0x2000, p - data);
+	  std::memmove (data, data + 0x2000, p - data);
 	}
       if (bitstream.bit())
 	{
@@ -231,8 +231,7 @@ namespace explode
 
     if (m_exe_file[exe_file::MAX_MEM_PARA] != 0)
       {
-	oexe[exe_file::MIN_MEM_PARA] = (uint16_t)(oexe[exe_file::MIN_MEM_PARA] - 
-						  m_header[eINC_SIZE] + ((m_header[eDECOMPRESSOR_SIZE] + 16 - 1) >> 4) + 9);
+	oexe[exe_file::MIN_MEM_PARA] -= m_header[eINC_SIZE] + ((m_header[eDECOMPRESSOR_SIZE] + 16 - 1) >> 4) + 9;
 	if (m_exe_file[exe_file::MAX_MEM_PARA] != (uint16_t)0xFFFF)
 	  {
 	    oexe[exe_file::MAX_MEM_PARA] = (uint16_t)(oexe[exe_file::MAX_MEM_PARA] - (m_header[eINC_SIZE] - oexe[exe_file::MIN_MEM_PARA]));

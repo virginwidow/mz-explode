@@ -161,8 +161,6 @@ namespace explode
 
 
     uint8_t sigbuff [sizeof (sig90)];
-	int x = sizeof (sig90);
-	int y = sizeof(sig91);
     if ((m_header [RELLOC_OFFSET] != 0x1c) || (m_header [OVERLAY_NUM] != 0))
       {
 	return false;

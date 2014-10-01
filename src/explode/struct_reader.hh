@@ -122,7 +122,7 @@ namespace explode
 				m_count = 0x10;
 			}
 			uint16_t x = m_word & 1;
-			m_word = m_word >> 1;
+			m_word = (uint16_t)(m_word >> 1);
 			m_count--;
 			if (m_count == 0)
 			{

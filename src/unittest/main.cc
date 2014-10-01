@@ -359,12 +359,6 @@ static void do_test(const char* test_name, const unsigned char* data, std::size_
 	{
 		std::vector <char> out_buff;
 		eval_digest <DECODER>(data, length, dgst, out_buff);
-	/*	
-		std::ostringstream os;
-		os << "x-" << test_name;
-		explode::file_output fo(os.str().c_str());
-		fo.write(out_buff.data(), out_buff.size());
-*/
 		for (int n = 0; n < MD5_DIGEST_LENGTH; n++)
 		{
 			std::string h(expected + 2 * n, expected + 2 * (n + 1));

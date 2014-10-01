@@ -139,7 +139,7 @@ namespace explode
       {
 	return false;
       }
-    const offset_type entry = (m_header [HEADER_SIZE_PARA] + (m_header [INITIAL_CS] << 4)) + m_header [INITIAL_IP];
+    const offset_type entry = ((uint32_t)(m_header [HEADER_SIZE_PARA] + m_header [INITIAL_CS]) << 4) + m_header [INITIAL_IP];
     m_file.seek (entry);
     m_file.read ((char*)sigbuff, sizeof (sigbuff));
     if (std::memcmp (sigbuff, sig90, sizeof (sig90)) == 0)
@@ -215,6 +215,10 @@ namespace explode
     if (size > 0)
       {
 		m_real_size = std::max(m_real_size, position + size);
+		if (m_code.size() < position + size)
+		{
+			m_code.resize (position + size);
+		}
 		std::memcpy(&m_code[position], code, size);
       }
   }
@@ -222,9 +226,13 @@ namespace explode
   void full_exe_file::code_copy (std::size_t from, std::size_t length, std::size_t to)
   {
     m_real_size = std::max (m_real_size, to + length);
+	if (m_code.size() < to + length)
+	{
+		m_code.resize(to + length);
+	}
     if (from + length < to)
       {
-	std::memcpy (&m_code[to], &m_code[from], length);
+		std::memcpy (&m_code[to], &m_code[from], length);
       }
     else
       {
@@ -242,15 +250,13 @@ namespace explode
       {
 	this->operator [] (exe_file::OVERLAY_NUM) = 0;
       }
-    if (!m_set [exe_file::RELLOCATION_ENTRIES])
-      {
+   
 	this->operator [] (exe_file::RELLOCATION_ENTRIES) = (uint16_t)m_rellocs.size ();
-      }
-    if (!m_set [exe_file::RELLOC_OFFSET])
-      {
+   
+   
 	this->operator [] (exe_file::RELLOC_OFFSET) = (uint16_t)(exe_file::MAX_HEADER_VAL*sizeof (uint16_t) + 
 								 m_extra_header.size ());
-      }
+   
     if (!m_set [exe_file::NUM_OF_PAGES])
       {
 	std::size_t total_size = m_header [exe_file::HEADER_SIZE_PARA]*16 + m_code.size ();
@@ -298,7 +304,11 @@ namespace explode
     } r;
     r.words = &m_rellocs[0];
     out.write (r.bytes, relloc_entries*4);
-    
+	const std::size_t now = out.tell();
+	if (now > para_size * 16)
+	{
+		throw decoder_error("bad header size");
+	}
     const std::size_t sz = para_size*16 - out.tell ();
     if (sz)
       {

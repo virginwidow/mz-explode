@@ -32,26 +32,30 @@ static void build_rellocs_90 (explode::input& file, std::vector <uint32_t>& rell
 // ----------------------------------------------------------------
 static void build_rellocs_91 (explode::input& file, std::vector <uint32_t>& rellocs)
 {
-  uint16_t seg  = 0;
-  uint16_t offs = 0;
-  uint16_t span = 0;
+  int16_t seg  = 0;
+  int16_t offs = 0;
+  int16_t span = 0;
   while (true)
     {
       uint8_t s;
       file.read (s);
       span = s & 0xFF;
-      if (span == 0)
-	{
-	  seg += 0x0FFF;
-	  continue;
-	}
-      else
-	{
-	  if (span == 1)
-	    {
-	      break;
-	    }
-	}
+	  if (span == 0)
+	  {
+		  file.read(span);
+		  if (span == 0)
+		  {
+			  seg += 0x0FFF;
+			  continue;
+		  }
+	  else
+	  {
+		  if (span == 1)
+		  {
+			  break;
+		  }
+	  }
+	  }
       offs += span;
       seg += (offs & ~0x0f)>>4;
       offs &= 0x0f;
@@ -69,8 +73,8 @@ static uint32_t unpak_code(explode::output_exe_file& oexe, explode::input& input
 
 	uint8_t data[0x4500], *p = data;
 	std::size_t opos = 0;
-	uint16_t len = 0;
-	uint16_t span;
+	int16_t len = 0;
+	int16_t span = 0;
 
 	while (true)
 	{
@@ -78,6 +82,7 @@ static uint32_t unpak_code(explode::output_exe_file& oexe, explode::input& input
 		{
 			oexe.code_put(opos, data, 0x2000);
 			opos += 0x2000;
+			p -= 0x2000;
 			std::memcpy(data, data + 0x2000, p - data);
 		}
 		if (bitstream.bit())
@@ -138,7 +143,7 @@ namespace explode
       m_exe_file (inp),
       m_ver (0)
   {
-    static const offset_type magic_offs = 0x0E;
+    static const offset_type magic_offs = 2*0x0E;
     
 	union
 	{
@@ -168,7 +173,7 @@ namespace explode
 	    throw decoder_error ("Unsuported version");
 	  }
       }
-    const offset_type header_pos = (inp [exe_file::HEADER_SIZE_PARA] + (inp [exe_file::INITIAL_CS] << 4));
+    const offset_type header_pos = (inp [exe_file::HEADER_SIZE_PARA] + inp [exe_file::INITIAL_CS]) << 4;
     m_file.seek (header_pos);
     union
     {
@@ -220,19 +225,30 @@ namespace explode
     oexe [exe_file::INITIAL_SP]    = m_header [eSP];
     oexe [exe_file::RELLOC_OFFSET] = 0x1C;
 
+	uint32_t fpos = 0x1C + oexe.rellocations().size()*4;
+	uint32_t i = (0x200 - (int)fpos) & 0x1ff;	/* v0.7 */
+	oexe[exe_file::HEADER_SIZE_PARA] = (int)((fpos + i) >> 4);	/* v0.7 */
+
 	if (m_exe_file[exe_file::MAX_MEM_PARA] != 0)
 	{
-
+		oexe[exe_file::MIN_MEM_PARA] -= m_header[eINC_SIZE] + ((m_header[eDECOMPRESSOR_SIZE] + 16 - 1) >> 4) + 9;
+		if (m_exe_file[exe_file::MAX_MEM_PARA] != 0xFFFF)
+		{
+			oexe[exe_file::MAX_MEM_PARA] -= (m_header[eINC_SIZE] - oexe[exe_file::MIN_MEM_PARA]);
+		}
 	}
 
-    offset_type orig_data_offs = 0xE;
-    m_file.seek (orig_data_offs);
-    for (; orig_data_offs < 0xF; orig_data_offs++)
-      {
-	uint8_t b;
-	m_file.read (b);
-	oexe.extra_header ().push_back (b);
-      }
+	oexe[exe_file::NUM_OF_BYTES_IN_LAST_PAGE] = ((uint16_t)load_size + (oexe[exe_file::HEADER_SIZE_PARA] << 4)) & 0x1ff;
+	oexe[exe_file::NUM_OF_PAGES] = (uint16_t)((load_size + ((uint32_t)oexe[exe_file::HEADER_SIZE_PARA] << 4) + 0x1ff) >> 9);
+
+
+    
+	oexe.eval_structures();
 	return load_size;
+  }
+  // ======================================================================
+  uint32_t unlzexe::decomp_size() const
+  {
+	  return 0;
   }
 } // ns explode

@@ -32,7 +32,7 @@ namespace explode
 	T*    words;
       } u;
       u.words = &x;
-      read (u.bytes, sizeof (T));
+      this->read (u.bytes, sizeof (T));
     }
   
 

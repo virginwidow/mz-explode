@@ -3,6 +3,7 @@
 #include <iomanip>
 #include "explode/io.hh"
 #include "explode/exe_file.hh"
+#include "explode/unlzexe.hh"
 
 // ===================================================================
 template <typename T>
@@ -130,7 +131,17 @@ int main (int argc, char* argv [])
       if (iexe.is_lzexe ())
 	{
 	  dump_exe_parameters (std::cout, ifile, iexe);
-	  explode::file_output ow (ofile);
+	  
+
+	  explode::unlzexe decoder(iexe);
+	  
+	  explode::full_exe_file fo(decoder.decomp_size());
+	  decoder.unpak(fo);
+	  std::cout << std::endl;
+	  dump_exe_parameters(std::cout, ofile, fo);
+	  explode::file_output ow(ofile);
+	  fo.write(ow);
+
 	}
       else
 	{

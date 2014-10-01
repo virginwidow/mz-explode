@@ -264,6 +264,7 @@ std::basic_ostream <char>& operator << (std::basic_ostream<char> &s, const setco
 #include "explode/io.hh"
 #include "explode/exe_file.hh"
 #include "explode/unpklite.hh"
+#include "explode/unlzexe.hh"
 
 #include "unittest/md5.h"
 
@@ -277,6 +278,10 @@ std::basic_ostream <char>& operator << (std::basic_ostream<char> &s, const setco
 #include "unittest/pklite_E_112.cc"  
 #include "unittest/pklite_E_120.cc"
 
+#include "unittest/z90.cc"
+#include "unittest/z91.cc"
+#include "unittest/z91e.cc"
+
 static int total_tests = 0;
 static int failed_tests = 0;
 
@@ -289,17 +294,50 @@ static const char* digest_pklite_E_112 = "8a4b841106bae1f32c7ca45e9d41c016";
 static const char* digest_pklite_E_115 = "56dccb4b55bdd7c57f09dbb584050a51";
 static const char* digest_pklite_E_120 = "8a4b841106bae1f32c7ca45e9d41c016";
 
+static const char* digest_lzexe_91   = "f38e4c688fcd8f3d4f102dc5e2b8bb0f"; 
+static const char* digest_lzexe_91_E = "f38e4c688fcd8f3d4f102dc5e2b8bb0f";
+static const char* digest_lzexe_90   = "620d7dce66a13ec7be84b9f390078aa6";
+
+
 typedef unsigned char md5_digest[MD5_DIGEST_LENGTH];
 
-static void pklite_digest(const unsigned char* data, std::size_t length, md5_digest& digest, std::vector<char>& out_buff)
+template <class DECODER>
+struct tester;
+
+template <>
+struct tester < explode::unpklite >
+{
+	static void test(explode::input_exe_file& iexe)
+	{
+		if (!iexe.is_pklite())
+		{
+			throw std::runtime_error("not a PKLITE");
+		}
+	}
+};
+
+template <>
+struct tester < explode::unlzexe >
+{
+	static void test(explode::input_exe_file& iexe)
+	{
+		if (!iexe.is_lzexe())
+		{
+			throw std::runtime_error("not a LZEXE");
+		}
+	}
+};
+
+
+template <typename DECODER>
+static void eval_digest(const unsigned char* data, std::size_t length, md5_digest& digest, std::vector<char>& out_buff)
 {
 	explode::inmem_input input(data, length);
 	explode::input_exe_file iexe(input);
-	if (!iexe.is_pklite())
-	{
-		throw std::runtime_error("not a PKLITE");
-	}
-	explode::unpklite decoder(iexe);
+	
+	tester <DECODER>::test(iexe);
+
+	DECODER decoder(iexe);
 	explode::full_exe_file fo(decoder.decomp_size());
 	decoder.unpak(fo);
 	
@@ -312,15 +350,15 @@ static void pklite_digest(const unsigned char* data, std::size_t length, md5_dig
 	MD5_Update(&c, &out_buff[0], out_buff.size ());
 	MD5_Final(digest, &c);
 }
-
-static void pklite_test(const char* test_name, const unsigned char* data, std::size_t length, const char* expected)
+template <typename DECODER>
+static void do_test(const char* test_name, const unsigned char* data, std::size_t length, const char* expected)
 {
 	md5_digest dgst;
 	bool ok = true;
 	try
 	{
 		std::vector <char> out_buff;
-		pklite_digest(data, length, dgst, out_buff);
+		eval_digest <DECODER>(data, length, dgst, out_buff);
 	/*	
 		std::ostringstream os;
 		os << "x-" << test_name;
@@ -353,7 +391,7 @@ static void pklite_test(const char* test_name, const unsigned char* data, std::s
 		s_ok = "FAILED";
 		col = RED;
 	}
-	std::cout << setcolour(GRAY) << "TEST #" << total_tests << ": PKLITE-" << test_name << " "
+	std::cout << setcolour(GRAY) << "TEST #" << total_tests << ": " << test_name << " "
 		<< setcolour(col) << s_ok << setcolour(GRAY) << std::endl;
 }
 
@@ -363,7 +401,8 @@ static void pklite_test(const char* test_name, const unsigned char* data, std::s
 #define STRINGIZE_HELPER(exp) #exp
 #define STRINGIZE(exp) STRINGIZE_HELPER(exp)
 
-#define PKLITE_TEST(NAME) pklite_test(STRINGIZE(NAME), CONCATENATE (data::pklite_, NAME), CONCATENATE(CONCATENATE (data::pklite_, NAME), _len), CONCATENATE(digest_, CONCATENATE (pklite_, NAME)))
+#define PKLITE_TEST(NAME) do_test <explode::unpklite>("PKLITE-" STRINGIZE(NAME), CONCATENATE (data::pklite_, NAME), CONCATENATE(CONCATENATE (data::pklite_, NAME), _len), CONCATENATE(digest_, CONCATENATE (pklite_, NAME)))
+#define LZEXE_TEST(NAME) do_test <explode::unlzexe>("LZEXE-" STRINGIZE(NAME), CONCATENATE (data::z, NAME), CONCATENATE(CONCATENATE (data::z, NAME), _len), CONCATENATE(digest_, CONCATENATE (lzexe_, NAME)))
 
 int main(int argc, char* argv[])
 {
@@ -376,6 +415,10 @@ int main(int argc, char* argv[])
 
 	PKLITE_TEST(150);
 	PKLITE_TEST(201);
+
+	LZEXE_TEST(90);
+	LZEXE_TEST(91);
+	LZEXE_TEST(91_E);
 
 	const colour col = (failed_tests == 0) ? GREEN : RED;
 	

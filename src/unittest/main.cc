@@ -339,7 +339,7 @@ static void eval_digest(const unsigned char* data, std::size_t length, md5_diges
 
 	DECODER decoder(iexe);
 	explode::full_exe_file fo(decoder.decomp_size());
-	decoder.unpak(fo);
+	decoder.unpack(fo);
 	
 	explode::inmem_output out(out_buff);
 	fo.write(out);

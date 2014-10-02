@@ -382,7 +382,7 @@ namespace explode
     _read_parameters ();
   }
   // ------------------------------------------------------------------
-  void unpklite::unpak (output_exe_file& oexe)
+  void unpklite::unpack (output_exe_file& oexe)
   {
     uint32_t bx = 0;
     

@@ -131,7 +131,7 @@ static void decode(explode::input_exe_file& iexe, const char* ifile, const char*
 	DECODER decoder(iexe);
 	dump_exe_parameters(std::cout, ifile, iexe, decoder);
 	explode::full_exe_file fo(decoder.decomp_size());
-	decoder.unpak(fo);
+	decoder.unpack(fo);
 	std::cout << std::endl;
 	dump_exe_parameters(std::cout, ofile, fo, false);
 	explode::file_output ow(ofile);
@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
 			{
 				if (iexe.is_exepack())
 				{
-				//	decode <explode::unexepack>(iexe, ifile, ofile);
+					decode <explode::unexepack>(iexe, ifile, ofile);
 				}
 				else
 				{

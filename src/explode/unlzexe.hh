@@ -15,7 +15,7 @@ namespace explode
   public:
     unlzexe (input_exe_file& inp);
 
-    void unpak (output_exe_file& oexe);
+    void unpack (output_exe_file& oexe);
     
     
     uint32_t decomp_size () const;

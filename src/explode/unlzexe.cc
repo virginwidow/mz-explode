@@ -200,7 +200,7 @@ namespace explode
 		     (uint32_t)inp[exe_file::HEADER_SIZE_PARA]) << 4;
   }
   // ------------------------------------------------------------------------
-  void unlzexe::unpak (output_exe_file& oexe)
+  void unlzexe::unpack (output_exe_file& oexe)
   {
     m_file.seek (m_rellocs_offset);
     if (m_ver == 90)

@@ -100,12 +100,12 @@ namespace explode
   // -------------------------------------------------------------
   offset_type inmem_input::tell()
   {
-	  return m_ptr;
+	  return (offset_type)m_ptr;
   }
   // -------------------------------------------------------------
   offset_type inmem_input::bytes_remains()
   {
-	  return m_size - m_ptr;
+	  return (offset_type)m_size - (offset_type)m_ptr;
   }
   // -------------------------------------------------------------
   void inmem_input::seek(offset_type offset)
@@ -194,7 +194,7 @@ namespace explode
   // -------------------------------------------------------------
   offset_type inmem_output::tell()
   {
-	  return m_ptr;
+	  return (offset_type)m_ptr;
   }
   // -------------------------------------------------------------
   void inmem_output::seek(offset_type offset)

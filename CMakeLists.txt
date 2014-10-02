@@ -453,10 +453,9 @@ endif ()
 
 set (modules
   explode
-  unpklite
-  unlzexe
   mzdump
   unittest
+  mzexplode
 )
 
 foreach (module ${modules})

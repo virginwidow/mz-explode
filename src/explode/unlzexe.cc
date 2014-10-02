@@ -200,7 +200,7 @@ namespace explode
 		     (uint32_t)inp[exe_file::HEADER_SIZE_PARA]) << 4;
   }
   // ------------------------------------------------------------------------
-  uint32_t unlzexe::unpak (output_exe_file& oexe)
+  void unlzexe::unpak (output_exe_file& oexe)
   {
     m_file.seek (m_rellocs_offset);
     if (m_ver == 90)
@@ -244,7 +244,6 @@ namespace explode
 
     
     oexe.eval_structures();
-    return load_size;
   }
   // ======================================================================
   uint32_t unlzexe::decomp_size() const

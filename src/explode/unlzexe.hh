@@ -15,16 +15,10 @@ namespace explode
   public:
     unlzexe (input_exe_file& inp);
 
-    uint32_t unpak (output_exe_file& oexe);
+    void unpak (output_exe_file& oexe);
     
-    uint32_t header_length () const;
+    
     uint32_t decomp_size () const;
-    uint32_t compressed_size () const;
-    uint32_t decompressor_size () const;
-    uint32_t data_offset () const;
-    bool     uncompressed_region () const;
-    bool     has_checksum () const;
-
   private:
     enum header_t
       {

@@ -41,6 +41,7 @@ namespace explode
     explicit input_exe_file (input& file);
     bool is_pklite () const;
     bool is_lzexe () const;
+	bool is_exepack() const;
     input& file ();
   private:
     input_exe_file (const input_exe_file&);

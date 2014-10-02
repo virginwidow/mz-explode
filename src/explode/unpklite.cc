@@ -382,7 +382,7 @@ namespace explode
     _read_parameters ();
   }
   // ------------------------------------------------------------------
-  uint32_t unpklite::unpak (output_exe_file& oexe)
+  void unpklite::unpak (output_exe_file& oexe)
   {
     uint32_t bx = 0;
     
@@ -507,7 +507,6 @@ namespace explode
     oexe.extra_header ().push_back (extra.bytes [1]);
     
     oexe.eval_structures ();
-    return bx;
   }
   // ------------------------------------------------------------------
   uint32_t unpklite::header_length () const

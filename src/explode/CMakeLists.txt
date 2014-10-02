@@ -4,6 +4,7 @@ set (src
   exe_file.cc
   unpklite.cc
   unlzexe.cc
+  unexepack.cc
 )
 
 set (hdr 
@@ -14,6 +15,7 @@ set (hdr
   unlzexe.hh
   byte_order.hh
   struct_reader.hh
+  unexepack.hh
 )
 
 add_library (explode STATIC ${src} ${hdr})

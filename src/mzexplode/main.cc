@@ -8,7 +8,7 @@
 #include "explode/unexepack.hh"
 // ===================================================================
 template <typename T>
-static void dump_info(std::ostream& os, const char* name, T v)
+void dump_info(std::ostream& os, const char* name, T v)
 {
 	os << std::left << std::setw(32) << name << ":\t" << std::hex << v << "\t" << std::dec << v << std::endl;
 }
@@ -25,12 +25,12 @@ static void dump_info(std::ostream& os, const char* name, uint16_t seg, uint16_t
 	}
 }
 // ---------------------------------------------------------------------------------------------------------
-static void dump_info(std::ostream& os, const char* name, const char* txt)
+void dump_info(std::ostream& os, const char* name, const char* txt)
 {
 	os << std::left << std::setw(32) << name << ":\t" << txt << std::endl;
 }
 // ---------------------------------------------------------------------------------------------------------
-static void dump_exe_parameters(std::ostream& os,
+void dump_exe_parameters(std::ostream& os,
 	const char* file,
 	const explode::exe_file& header,
 	bool is_input)
@@ -56,7 +56,7 @@ static void dump_exe_parameters(std::ostream& os,
 	dump_info(os, "Relocation entries", header[exe_file::RELLOCATION_ENTRIES]);
 }
 // ---------------------------------------------------------------------------------------------------------
-static void dump_exe_parameters(std::ostream& os,
+void dump_exe_parameters(std::ostream& os,
 	const char* ifile,
 	const explode::exe_file& header,
 	const explode::unpklite& decoder)
@@ -109,18 +109,18 @@ static void dump_exe_parameters(std::ostream& os,
 	dump_info(os, "Offset to compressed image", decoder.data_offset());
 }
 // ---------------------------------------------------------------------------------------------------------
-static void dump_exe_parameters(std::ostream& os,
+void dump_exe_parameters(std::ostream& os,
 	const char* ifile,
 	const explode::exe_file& header,
-	const explode::unlzexe& decoder)
+	const explode::unlzexe& /*decoder*/)
 {
 	dump_exe_parameters(os, ifile, header, true);
 }
 // ---------------------------------------------------------------------------------------------------------
-static void dump_exe_parameters(std::ostream& os,
+void dump_exe_parameters(std::ostream& os,
 	const char* ifile,
 	const explode::exe_file& header,
-	const explode::unexepack& decoder)
+	const explode::unexepack& /*decoder*/)
 {
 	dump_exe_parameters(os, ifile, header, true);
 }
@@ -129,7 +129,7 @@ template <typename DECODER>
 static void decode(explode::input_exe_file& iexe, const char* ifile, const char* ofile)
 {
 	DECODER decoder(iexe);
-	dump_exe_parameters(std::cout, ifile, iexe, decoder);
+	dump_exe_parameters(std::cout, ifile, (explode::exe_file&)iexe, decoder);
 	explode::full_exe_file fo(decoder.decomp_size());
 	decoder.unpack(fo);
 	std::cout << std::endl;

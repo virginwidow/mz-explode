@@ -375,7 +375,7 @@ namespace explode
     static offset_type pklite_info_offset = 2*0x0E;
     m_file.seek (pklite_info_offset);
     m_file.read (m_h_pklite_info);
-
+	m_h_pklite_info = byte_order::from_little_endian (m_h_pklite_info);
     if (!is_supported (m_h_pklite_info))
       {
 	throw decoder_error ("Unsuported version");
@@ -504,7 +504,8 @@ namespace explode
       uint16_t* words;
     } extra;
 
-    extra.words = &m_h_pklite_info;
+    uint16_t temp_extra = byte_order::to_little_endian (m_h_pklite_info);
+	extra.words = &temp_extra;
 
     oexe.extra_header ().push_back (extra.bytes [0]);
     oexe.extra_header ().push_back (extra.bytes [1]);
@@ -651,12 +652,14 @@ namespace explode
 	m_decomp_size = f () << 4;
 
 	m_decomp_size += (f () << 0x0C);
+
 	m_decomp_size += 0x100;
 
 	f.seek (4);
 
 	m_compressed_size =   f () << 4;
 	m_compressed_size += (f () << 0x0C);
+
 
 	f.seek (0x1D);
 
@@ -665,6 +668,7 @@ namespace explode
 	f.seek (0x23);
 	m_decompressor_size += f ();
 	m_decompressor_size += (f () << 8);
+
 
 	if (m_h_pklite_info == 0x210C || m_h_pklite_info == 0x310C || 
 	    m_h_pklite_info == 0x210D || m_h_pklite_info == 0x310D)

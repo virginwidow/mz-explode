@@ -420,8 +420,11 @@ namespace explode
 		std::vector <rellocation> new_rel (relloc_entries);
 		for (std::size_t i = 0; i < relloc_entries; i++)
 		{
-			new_rel [i].rel = byte_order::to_little_endian(m_rellocs[i].rel);
-			new_rel [i].seg = byte_order::to_little_endian(m_rellocs[i].seg);
+			new_rel [i].rel = m_rellocs[i].rel;
+			new_rel [i].seg = m_rellocs[i].seg;
+			#if defined(EXPLODE_BIG_ENDIAN)
+				std::swap (new_rel [i].rel, new_rel [i].seg);
+			#endif
 		}
 		r.words = &new_rel[0];
 		out.write(r.bytes, relloc_entries * 4);

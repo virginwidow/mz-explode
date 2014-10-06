@@ -41,12 +41,12 @@ namespace explode
 
 		operator uint32_t () const
 		{
-			return data.eax;
+			return byte_order::from_little_endian (data.eax);
 		}
 
 		operator uint16_t () const
 		{
-			return data.r32.r16.ax;
+			return byte_order::from_little_endian (data.r32.r16.ax);
 		}
 
 		operator uint8_t () const

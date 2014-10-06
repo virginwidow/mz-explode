@@ -8,7 +8,7 @@
 #include "explode/exceptions.hh"
 #include "explode/byte_order.hh"
 
-static void build_rellocs_90 (explode::input& file, std::vector <uint32_t>& rellocs)
+static void build_rellocs_90 (explode::input& file, std::vector <explode::rellocation>& rellocs)
 {
   int16_t seg = 0;
   do
@@ -21,16 +21,14 @@ static void build_rellocs_90 (explode::input& file, std::vector <uint32_t>& rell
 	{
 	  uint16_t offs;
 	  file.read (offs);
-	  uint32_t x = seg;
-	  x <<= 16;
-	  x |= offs;
-	  rellocs.push_back (x);
+	  offs = explode::byte_order::from_little_endian(offs);
+	  rellocs.push_back (explode::rellocation (seg, offs));
 	}
       seg = (int16_t)(seg + 0x1000);
     } while (seg != (int16_t)(0xF000+0x1000));
 }
 // ----------------------------------------------------------------
-static void build_rellocs_91 (explode::input& file, std::vector <uint32_t>& rellocs)
+static void build_rellocs_91 (explode::input& file, std::vector <explode::rellocation>& rellocs)
 {
   int16_t seg  = 0;
   int16_t offs = 0;
@@ -59,10 +57,7 @@ static void build_rellocs_91 (explode::input& file, std::vector <uint32_t>& rell
       offs = (int16_t)(offs + span);
       seg = (int16_t)(seg + (int16_t)((offs & ~0x0f)>>4));
       offs &= 0x0f;
-      uint32_t x = seg;
-      x <<= 16;
-      x |= offs;
-      rellocs.push_back (x);
+      rellocs.push_back (explode::rellocation (seg, offs));
     };
 }
 

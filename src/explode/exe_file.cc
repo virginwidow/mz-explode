@@ -203,7 +203,7 @@ namespace explode
 	  try
 	  {
 		  offset_type exepack_hdr_start = exe_data_start + exe_len;
-		  m_file.seek(exepack_hdr_start + 0xE);
+		  m_file.seek(exepack_hdr_start + 0x12 - 2);
 		  char magic[2];
 		  m_file.read(magic, 2);
 
@@ -212,21 +212,12 @@ namespace explode
 		  {
 			  return false;
 		  }
-		  
-		  m_file.seek(exepack_hdr_start + 0x6);
-		  union
-		  {
-			  char bytes[2];
-			  uint16_t word;
-		  } u;
-		  
-		  m_file.read(u.bytes, 2);
-		  uint16_t unpk_len = byte_order::from_little_endian (u.word);
-		  const offset_type str_offs = exepack_hdr_start + 0xFC; // exepack_hdr_start + unpk_len;
+		  const offset_type str_offs = exepack_hdr_start + 0x12 + 0x105; // exepack_hdr_start + unpk_len;
 		  m_file.seek(str_offs);
 		  char str[0x16];
 		  m_file.read(str, sizeof(str));
-		  return (std::memcpy(str, "Packed file is corrupt", 0x16) == 0);
+		  const int rc = std::memcmp (str, "Packed file is corrupt", 0x16);
+		  return rc == 0;
 	  }
 	  catch (...)
 	  {
@@ -294,6 +285,18 @@ namespace explode
     m_code.resize (code_size);
   }
   // -------------------------------------------------------------------
+  void full_exe_file::code_set(uint8_t word, std::size_t length)
+  {
+	  if (length != m_code.size())
+	  {
+		  m_code.resize(length, word);
+	  }
+	  else
+	  {
+		  std::memset(&m_code[0], word, length);
+	  }
+  }
+  // -------------------------------------------------------------------
   void full_exe_file::code_put(std::size_t position, const uint8_t* code, std::size_t size)
   {
     if (size > 0)
@@ -305,6 +308,19 @@ namespace explode
 		}
 		std::memcpy(&m_code[position], code, size);
       }
+  }
+  // -------------------------------------------------------------------
+  void full_exe_file::code_fill(std::size_t position, uint8_t code, std::size_t length)
+  {
+	  if (length > 0)
+	  {
+		  m_real_size = std::max(m_real_size, position + length);
+		  if (m_code.size() < position + length)
+		  {
+			  m_code.resize(position + length);
+		  }
+		  std::memset(&m_code[position], code, length);
+	  }
   }
   // -------------------------------------------------------------------
   void full_exe_file::code_copy (std::size_t from, std::size_t length, std::size_t to)
@@ -341,6 +357,17 @@ namespace explode
 	this->operator [] (exe_file::RELLOC_OFFSET) = (uint16_t)(exe_file::MAX_HEADER_VAL*sizeof (uint16_t) + 
 								 m_extra_header.size ());
    
+	if (!m_set[exe_file::HEADER_SIZE_PARA])
+	{
+		std::size_t hsize = sizeof(m_header) + m_rellocs.size () * 4;
+		std::size_t hp = hsize / 16;
+		if (hsize % 16)
+		{
+			hp++;
+		}
+		this->operator[] (exe_file::HEADER_SIZE_PARA) = hp;
+	}
+
     if (!m_set [exe_file::NUM_OF_PAGES])
       {
 	std::size_t total_size = m_header [exe_file::HEADER_SIZE_PARA]*16 + m_code.size ();
@@ -355,6 +382,7 @@ namespace explode
       {
 	this->operator [] (exe_file::MAX_MEM_PARA) = 0xFFFF;
       }
+	
   }
   // ------------------------------------------------------------------  
   void full_exe_file::write (output& out) const
@@ -381,19 +409,29 @@ namespace explode
       {
 	out.write ((char*)&m_extra_header [0], m_extra_header.size ());
       }
-    union 
-    {
-      const char* bytes;
-      const uint32_t* words;
-    } r;
-    r.words = &m_rellocs[0];
-    out.write (r.bytes, relloc_entries*4);
+	if (!m_rellocs.empty())
+	{
+		union
+		{
+			const char* bytes;
+			const rellocation* words;
+		} r;
+		
+		std::vector <rellocation> new_rel (relloc_entries);
+		for (std::size_t i = 0; i < relloc_entries; i++)
+		{
+			new_rel [i].rel = byte_order::to_little_endian(m_rellocs[i].rel);
+			new_rel [i].seg = byte_order::to_little_endian(m_rellocs[i].seg);
+		}
+		r.words = &new_rel[0];
+		out.write(r.bytes, relloc_entries * 4);
+	}
 	const std::size_t now = out.tell();
 	if (now > para_size * 16)
 	{
 		throw decoder_error("bad header size");
 	}
-    const std::size_t sz = para_size*16 - out.tell ();
+    const std::size_t sz = para_size*16 - now;
     if (sz)
       {
 	std::vector <char> dummy (sz, 0);

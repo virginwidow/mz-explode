@@ -287,15 +287,14 @@ namespace
   // ===================================================================
   explode::offset_type build_rellocs (uint16_t h_pklite_info,
 				      explode::struct_reader <uint32_t>& f, 
-				      std::vector <uint32_t>& rellocs)
+				      std::vector <explode::rellocation>& rellocs)
   {
     uint32_t relocs_count = 0;
     uint32_t cur_pos = f.tell ();
     uint32_t var_counter = 0;
     uint32_t length_code = 0;
     uint32_t has_bytes = 0;
-    uint32_t var_18;
-    
+        
     if ((h_pklite_info & 0x1000) == 0)
       {
 	while (true)
@@ -314,9 +313,11 @@ namespace
 	    while (has_bytes < length_code)
 	      {
 		// 4f87
-		var_18 = f () + (f () << 8);
-		var_18 |= (var_counter << 16);
-		rellocs.push_back (var_18);
+		uint16_t rel = f () + (f () << 8);
+		rel = explode::byte_order::from_little_endian(rel);
+		uint16_t seg = explode::byte_order::from_little_endian(var_counter);
+		
+		rellocs.push_back (explode::rellocation (seg, rel));
 		relocs_count++;
 		has_bytes++;
 	      }
@@ -328,7 +329,8 @@ namespace
 	var_counter = 0;
 	while (true)
 	  {
-	    length_code = f () + (f () << 8);
+	    uint16_t w = f () + (f () << 8);
+		length_code = explode::byte_order::from_little_endian(w);
 	    if (length_code == 0xFFFF)
 	      {
 		break;
@@ -339,9 +341,10 @@ namespace
 		while (has_bytes < length_code)
 		  {
 		    //5013:;
-		    var_18 = f () + (f () << 8);
-			var_18 |= (var_counter << 16);
-		    rellocs.push_back (var_18);
+		    uint16_t rel = f () + (f () << 8);
+			rel = explode::byte_order::from_little_endian(rel);
+			uint16_t seg = var_counter;
+		    rellocs.push_back (explode::rellocation (seg, rel));
 		    relocs_count++;
 		    has_bytes++;
 		  }

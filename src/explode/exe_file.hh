@@ -52,10 +52,29 @@ namespace explode
   // ==============================================================
   class output;
 
+  struct rellocation
+  {
+	  rellocation()
+		  : seg(0),
+		  rel(0)
+	  {
+
+	  }
+
+	  rellocation(uint16_t s, uint16_t r)
+		  : seg(s),
+		  rel(r)
+	  {
+
+	  }
+	  uint16_t rel;
+	  uint16_t seg;
+  };
+
   class output_exe_file : public exe_file
   {
   public:
-    typedef std::vector <uint32_t> rellocations_t;
+    typedef std::vector <rellocation> rellocations_t;
   public:
     output_exe_file ();
     virtual ~output_exe_file ();
@@ -68,7 +87,10 @@ namespace explode
     std::vector <uint8_t>& extra_header ();
     const std::vector <uint8_t>& extra_header () const;
 
+	virtual void code_set(uint8_t word, std::size_t length) = 0;
 	virtual void code_put(std::size_t position, const uint8_t* code, std::size_t length) = 0;
+	virtual void code_fill(std::size_t position, uint8_t code, std::size_t length) = 0;
+
     void code_put (std::size_t position, const std::vector <uint8_t>& code);
     virtual void code_copy (std::size_t from, std::size_t length, std::size_t to) = 0;
     
@@ -89,7 +111,9 @@ namespace explode
   public:
     explicit full_exe_file (uint32_t code_size);
 	
+	virtual void code_set(uint8_t word, std::size_t length);
 	virtual void code_put(std::size_t position, const uint8_t* code, std::size_t length);
+	virtual void code_fill(std::size_t position, uint8_t code, std::size_t length);
     virtual void code_copy (std::size_t from, std::size_t length, std::size_t to);
     
     virtual void eval_structures ();

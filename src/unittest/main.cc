@@ -347,8 +347,8 @@ static void eval_digest(const unsigned char* data, std::size_t length, md5_diges
 
 	MD5_CTX c;
 	MD5_Init(&c);
-	MD5_Update(&c, (const uint8_t*)&out_buff[0], (unsigned long)out_buff.size ());
-	MD5_Final(&c, digest);
+	MD5_Update(&c, &out_buff[0], (unsigned long)out_buff.size ());
+	MD5_Final(digest, &c);
 }
 template <typename DECODER>
 static void do_test(const char* test_name, const unsigned char* data, std::size_t length, const char* expected)
@@ -359,6 +359,10 @@ static void do_test(const char* test_name, const unsigned char* data, std::size_
 	{
 		std::vector <char> out_buff;
 		eval_digest <DECODER>(data, length, dgst, out_buff);
+		
+		
+
+
 		for (int n = 0; n < MD5_DIGEST_LENGTH; n++)
 		{
 			std::string h(expected + 2 * n, expected + 2 * (n + 1));
@@ -369,9 +373,13 @@ static void do_test(const char* test_name, const unsigned char* data, std::size_
 			{
 				ok = false;
 				break;
+
+
+
 			}
 		}
 	}
+	
 	catch (...)
 	{
 		ok = false;
@@ -387,6 +395,18 @@ static void do_test(const char* test_name, const unsigned char* data, std::size_
 	}
 	std::cout << setcolour(GRAY) << "TEST #" << total_tests << ": " << test_name << " "
 		<< setcolour(col) << s_ok << setcolour(GRAY) << std::endl;
+	if (!ok)
+	{
+		std::cout << "E " << expected << std::endl;
+
+		std::cout << "A ";
+		for (int n = 0; n < MD5_DIGEST_LENGTH; n++)
+		{
+			std::cout << std::setw(2) << std::setfill('0') << std::hex
+				<< ((int)dgst[n] & 0xFF);
+		}
+		std::cout << std::endl;
+	}
 }
 
 #define CONCATENATE_DIRECT(s1,s2) s1##s2

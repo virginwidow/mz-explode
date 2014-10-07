@@ -347,8 +347,8 @@ static void eval_digest(const unsigned char* data, std::size_t length, md5_diges
 
 	MD5_CTX c;
 	MD5_Init(&c);
-	MD5_Update(&c, &out_buff[0], (unsigned long)out_buff.size ());
-	MD5_Final(digest, &c);
+	MD5_Update(&c, (const uint8_t*)&out_buff[0], (unsigned long)out_buff.size ());
+	MD5_Final(&c, digest);
 }
 template <typename DECODER>
 static void do_test(const char* test_name, const unsigned char* data, std::size_t length, const char* expected)

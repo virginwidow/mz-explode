@@ -91,7 +91,10 @@ namespace explode
 		{
 			return m_input.tell();
 		}
-
+		explode::input& input()
+		{
+			return m_input;
+		}
 	private:
 		explode::input& m_input;
 		const uint32_t  m_header_length;

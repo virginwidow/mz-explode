@@ -54,7 +54,7 @@ namespace explode
   offset_type file_input::tell ()
   {
     const long pos = ftell (m_file);
-    if (pos <= 0)
+    if (pos < 0)
       {
 	throw input_error ();
       }

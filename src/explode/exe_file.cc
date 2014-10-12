@@ -450,8 +450,8 @@ namespace explode
 		{
 			const uint16_t rel = byte_order::to_little_endian (m_rellocs[i].rel);
 			const uint16_t seg = byte_order::to_little_endian(m_rellocs[i].seg);
-			new_rel[2*i] = rel;
-			new_rel[2 * i+1] = seg;
+			new_rel[2*i]   = rel;
+			new_rel[2*i+1] = seg;
 		}
 		r.words = &new_rel[0];
 		out.write(r.bytes, relloc_entries * 4);

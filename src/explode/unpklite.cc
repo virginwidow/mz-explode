@@ -286,12 +286,14 @@ namespace
   }
   // ===================================================================
   explode::offset_type build_rellocs (uint16_t h_pklite_info,
-				      explode::struct_reader <uint32_t>& f, 
+				      explode::struct_reader <uint32_t>& fr, 
 				      std::vector <explode::rellocation>& rellocs)
   {
+
+	explode::struct_reader <uint16_t> f(fr.input ());
     uint32_t relocs_count = 0;
     uint32_t cur_pos = f.tell ();
-    uint32_t var_counter = 0;
+    uint16_t var_counter = 0;
     uint32_t length_code = 0;
     uint32_t has_bytes = 0;
         
@@ -314,7 +316,7 @@ namespace
 	      {
 		// 4f87
 		uint16_t rel = f () + (f () << 8);
-		rel = explode::byte_order::from_little_endian(rel);
+		//rel = explode::byte_order::from_little_endian(rel);
 		uint16_t seg = explode::byte_order::from_little_endian(var_counter);
 		
 		rellocs.push_back (explode::rellocation (seg, rel));

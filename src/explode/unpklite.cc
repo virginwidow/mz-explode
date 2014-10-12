@@ -316,8 +316,7 @@ namespace
 	      {
 		// 4f87
 		uint16_t rel = f () + (f () << 8);
-		//rel = explode::byte_order::from_little_endian(rel);
-		uint16_t seg = explode::byte_order::from_little_endian(var_counter);
+		uint16_t seg = var_counter;
 		
 		rellocs.push_back (explode::rellocation (seg, rel));
 		relocs_count++;
@@ -331,8 +330,7 @@ namespace
 	var_counter = 0;
 	while (true)
 	  {
-	    uint16_t w = f () + (f () << 8);
-		length_code = explode::byte_order::from_little_endian(w);
+	    length_code = f () + (f () << 8);
 	    if (length_code == 0xFFFF)
 	      {
 		break;
@@ -344,7 +342,6 @@ namespace
 		  {
 		    //5013:;
 		    uint16_t rel = f () + (f () << 8);
-			rel = explode::byte_order::from_little_endian(rel);
 			uint16_t seg = var_counter;
 		    rellocs.push_back (explode::rellocation (seg, rel));
 		    relocs_count++;

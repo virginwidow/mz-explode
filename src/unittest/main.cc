@@ -343,7 +343,15 @@ static void eval_digest(const unsigned char* data, std::size_t length, md5_diges
 	
 	explode::inmem_output out(out_buff);
 	fo.write(out);
-	
+
+	static int k = 1;
+
+	std::ostringstream os;
+	os << k << ".dump";
+	FILE* f = fopen (os.str ().c_str (), "wb");
+	fwrite ( &out_buff[0], (unsigned long)out_buff.size (), 1, f);
+	fclose (f);
+	k++;
 
 	MD5_CTX c;
 	MD5_Init(&c);
@@ -353,7 +361,7 @@ static void eval_digest(const unsigned char* data, std::size_t length, md5_diges
 template <typename DECODER>
 static void do_test(const char* test_name, const unsigned char* data, std::size_t length, const char* expected)
 {
-	md5_digest dgst;
+	md5_digest dgst = {0};
 	bool ok = true;
 	try
 	{

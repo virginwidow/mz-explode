@@ -10,8 +10,36 @@
 static const uint16_t MSDOS_MAGIC   = 0x5A4D;
 static const uint16_t MSDOS_MAGIC_1 = 0x4D5A;
 
+static const char* header_to_string(explode::exe_file::header_t h)
+{
+	switch (h)
+	{
+	case explode::exe_file::SIGNATURE: return "SIGNATURE";
+	case explode::exe_file::NUM_OF_BYTES_IN_LAST_PAGE: return "NUM_OF_BYTES_IN_LAST_PAGE";
+	case explode::exe_file::NUM_OF_PAGES: return "NUM_OF_PAGES";
+	case explode::exe_file::RELLOCATION_ENTRIES: return "RELLOCATION_ENTRIES";
+	case explode::exe_file::HEADER_SIZE_PARA: return "HEADER_SIZE_PARA";
+	case explode::exe_file::MIN_MEM_PARA: return "MIN_MEM_PARA";
+	case explode::exe_file::MAX_MEM_PARA: return "MAX_MEM_PARA";
+	case explode::exe_file::INITIAL_SS: return "INITIAL_SS";
+	case explode::exe_file::INITIAL_SP: return "INITIAL_SP";
+	case explode::exe_file::CHECKSUM: return "CHECKSUM";
+	case explode::exe_file::INITIAL_IP: return "INITIAL_IP";
+	case explode::exe_file::INITIAL_CS: return "INITIAL_CS";
+	case explode::exe_file::RELLOC_OFFSET: return "RELLOC_OFFSET";
+	case explode::exe_file::OVERLAY_NUM: return "OVERLAY_NUM";
+	}
+	return "";
+}
+
 namespace explode
 {
+	std::ostream& operator << (std::ostream& os, exe_file::header_t h)
+	{
+		os << header_to_string(h);
+		return os;
+	}
+	// =======================================================
   exe_file::exe_file ()
   {
     std::memset (m_header, 0, sizeof (m_header));
@@ -414,17 +442,16 @@ namespace explode
 		union
 		{
 			const char* bytes;
-			const rellocation* words;
+			const uint16_t* words;
 		} r;
 		
-		std::vector <rellocation> new_rel (relloc_entries);
+		std::vector <uint16_t> new_rel (relloc_entries*2);
 		for (std::size_t i = 0; i < relloc_entries; i++)
 		{
-			new_rel [i].rel = m_rellocs[i].rel;
-			new_rel [i].seg = m_rellocs[i].seg;
-			#if defined(EXPLODE_BIG_ENDIAN)
-				std::swap (new_rel [i].rel, new_rel [i].seg);
-			#endif
+			const uint16_t rel = byte_order::to_little_endian (m_rellocs[i].rel);
+			const uint16_t seg = byte_order::to_little_endian(m_rellocs[i].seg);
+			new_rel[2*i] = rel;
+			new_rel[2 * i+1] = seg;
 		}
 		r.words = &new_rel[0];
 		out.write(r.bytes, relloc_entries * 4);

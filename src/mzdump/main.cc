@@ -55,6 +55,7 @@ enum dump_mode_t
 	eDUMP_EXTRA,
 	eDUMP_RELOC,
 	eDUMP_CODE,
+	eCOMPARE,
 	eDUMP_NONE
 };
 // --------------------------------------------------------------------
@@ -110,6 +111,15 @@ static void dump_rellocs(const explode::exe_file& header, const char* ofile, exp
 	std::cout << "Rellocations has been saved to " << ofile << " (" << sz << " bytes)" << std::endl;
 }
 // --------------------------------------------------------------------
+static void load_code(const explode::exe_file& header, explode::input& input, std::vector <char>& out)
+{
+	const explode::offset_type end_of_mz_header = header[explode::exe_file::HEADER_SIZE_PARA] * 16;
+	input.seek(end_of_mz_header);
+	const std::size_t sz = input.bytes_remains();
+	out.resize(sz);
+	input.read(&out[0], sz);
+}
+// --------------------------------------------------------------------
 static void dump_code(const explode::exe_file& header, const char* ofile, explode::input& input)
 {
 	const explode::offset_type end_of_mz_header = header[explode::exe_file::HEADER_SIZE_PARA] * 16;
@@ -126,6 +136,43 @@ static void dump_code(const explode::exe_file& header, const char* ofile, explod
 	std::cout << "Code has been saved to " << ofile << " (" << sz << " bytes)" << std::endl;
 }
 // --------------------------------------------------------------------
+static bool compare_headers(explode::input_exe_file& iexe1, explode::input_exe_file& iexe2)
+{
+	std::cout << "Header check ";
+	for (int i = 0; i < explode::exe_file::MAX_HEADER_VAL; i++)
+	{
+		explode::exe_file::header_t h = (explode::exe_file::header_t)i;
+
+		if (iexe1[h] != iexe2[h])
+		{
+			std::cout << std::endl;
+			std::cout << "DIFF: (" << h << ") " << iexe1[h] << " : " << iexe2[h] << std::endl;
+			return false;
+		}
+	}
+	std::cout << " OK" << std::endl;
+	return true;
+}
+// --------------------------------------------------------------------
+static void compare_files(const char* file1, const char* file2)
+{
+	explode::file_input inp1 (file1);
+	explode::file_input inp2 (file2);
+
+	if (inp1.bytes_remains() != inp2.bytes_remains())
+	{
+		std::cerr << "File size differs" << std::endl;
+		return;
+	}
+	explode::input_exe_file iexe1 (inp1);
+	explode::input_exe_file iexe2 (inp2);
+
+	if (!compare_headers(iexe1, iexe2))
+	{
+		return;
+	}
+}
+// --------------------------------------------------------------------
 int main (int argc, char* argv [])
 {
   if (argc != 4)
@@ -133,7 +180,8 @@ int main (int argc, char* argv [])
 	  std::cerr << "USAGE: " << argv[0] << "<-e|-r|-c> <input> <output>" << std::endl
 		  << "\t-e : dump extra information" << std::endl
 		  << "\t-r : dump rellocation table" << std::endl
-		  << "\t-c : dump code" << std::endl;
+		  << "\t-c : dump code" << std::endl
+		  << "\t-m : intelligent compare" << std::endl;
       return 1;
     }
 
@@ -156,6 +204,13 @@ int main (int argc, char* argv [])
 		  {
 			  mode = eDUMP_CODE;
 		  }
+		  else 
+		  {
+			  if (s_mode == "-m")
+			  {
+				  mode = eCOMPARE;
+			  }
+		  }
 	  }
   }
 
@@ -172,7 +227,10 @@ int main (int argc, char* argv [])
     {
       explode::file_input input (ifile);
       explode::input_exe_file iexe (input);
-	  dump_exe_parameters(std::cout, iexe);
+	  if (mode != eCOMPARE)
+	  {
+		  dump_exe_parameters(std::cout, iexe);
+	  }
 
 	  input.seek(0);
 	  switch (mode)
@@ -185,6 +243,9 @@ int main (int argc, char* argv [])
 		  break;
 	  case eDUMP_EXTRA:
 		  dump_extra(iexe, ofile, input);
+		  break;
+	  case eCOMPARE:
+		  compare_files(ifile, ofile);
 		  break;
 	  default:
 		  assert(false);

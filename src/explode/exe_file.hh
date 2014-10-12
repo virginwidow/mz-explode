@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <vector>
+#include <iosfwd>
 
 namespace explode
 {
@@ -34,6 +35,9 @@ namespace explode
   protected:
     uint16_t m_header [MAX_HEADER_VAL];
   };
+
+  std::ostream& operator << (std::ostream& os, exe_file::header_t h);
+
   // ==============================================================
   class input_exe_file : public exe_file
   {

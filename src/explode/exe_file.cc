@@ -46,7 +46,7 @@ namespace explode
     std::memset (m_header, 0, sizeof (m_header));
   }
   // --------------------------------------------------------
-  uint16_t exe_file::operator [] (header_t hv) const
+  const uint16_t& exe_file::operator [] (header_t hv) const
   {
     return m_header [hv];
   }

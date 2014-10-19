@@ -282,7 +282,7 @@ namespace
 	      }
 	  }
       }
-#if !defined(__clang__)
+#if !defined(__clang__) && !defined(__SUNPRO_CC)
     throw explode::decoder_error ("should not be here");
     return 0;
 #endif

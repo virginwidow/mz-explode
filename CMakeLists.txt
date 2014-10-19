@@ -148,8 +148,8 @@ endif ()
 
 # Multi-threading support
 if(CMAKE_SYSTEM_NAME STREQUAL "SunOS")
-  set(MULTI_THREADED_COMPILE_FLAGS "-pthreads")
-  set(MULTI_THREADED_LINK_LIBS rt)
+  set(MULTI_THREADED_COMPILE_FLAGS "")
+  set(MULTI_THREADED_LINK_LIBS rt "-pthreads")
   set(EXPLODE_PLATFORM "sunos")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "BeOS")
   # No threading options necessary for BeOS

@@ -31,7 +31,7 @@ namespace explode
 	MAX_HEADER_VAL              // 0xE
       };
     exe_file ();
-    uint16_t operator [] (header_t hv) const;
+    const uint16_t& operator [] (header_t hv) const;
   protected:
     uint16_t m_header [MAX_HEADER_VAL];
   };
@@ -76,6 +76,7 @@ namespace explode
   public:
     typedef std::vector <rellocation> rellocations_t;
   public:
+  	using exe_file::operator [];
     output_exe_file ();
     virtual ~output_exe_file ();
 
@@ -109,6 +110,9 @@ namespace explode
   class full_exe_file : public output_exe_file
   {
   public:
+
+	using output_exe_file::code_put;
+
     explicit full_exe_file (uint32_t code_size);
 	
 	virtual void code_set(uint8_t word, std::size_t length);

@@ -5,6 +5,7 @@ set (src
   unpklite.cc
   unlzexe.cc
   unexepack.cc
+  knowledge_dynamics.cc
 )
 
 set (hdr 
@@ -16,6 +17,7 @@ set (hdr
   byte_order.hh
   struct_reader.hh
   unexepack.hh
+  knowledge_dynamics.hh
 )
 
 add_library (explode STATIC ${src} ${hdr})

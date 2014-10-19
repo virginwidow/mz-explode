@@ -6,6 +6,7 @@
 #include "explode/unlzexe.hh"
 #include "explode/unpklite.hh"
 #include "explode/unexepack.hh"
+#include "explode/knowledge_dynamics.hh"
 
 #if defined(__clang__)
 #define PRIVATE static
@@ -120,6 +121,14 @@ PRIVATE void dump_exe_parameters(std::ostream& os,
 	dump_exe_parameters(os, ifile, header, true);
 }
 // -------------------------------------------------------------------
+PRIVATE void dump_exe_parameters(std::ostream& os,
+	const char* ifile,
+	const explode::exe_file& header,
+	const explode::knowledge_dynamics& /*decoder*/)
+{
+	dump_exe_parameters(os, ifile, header, true);
+}
+// -------------------------------------------------------------------
 template <typename DECODER>
 PRIVATE void decode(explode::input_exe_file& iexe, const char* ifile, const char* ofile)
 {
@@ -166,8 +175,15 @@ int main(int argc, char* argv[])
 				}
 				else
 				{
-					std::cerr << "Unsupported exe format" << std::endl;
-					return 1;
+					if (explode::knowledge_dynamics::accept(iexe))
+					{
+						decode <explode::knowledge_dynamics>(iexe, ifile, ofile);
+					}
+					else
+					{
+						std::cerr << "Unsupported exe format" << std::endl;
+						return 1;
+					}
 				}
 			}
 		}

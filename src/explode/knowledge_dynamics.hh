@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include "explode/exe_file.hh"
+
 namespace explode
 {
 	class input_exe_file;
@@ -25,6 +27,10 @@ namespace explode
 
 		uint32_t m_expected_size;
 		uint32_t m_code_offs;
+		
+		uint16_t m_header[exe_file::MAX_HEADER_VAL];
+
+
 	};
 } // ns explode
 

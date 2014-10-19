@@ -33,6 +33,10 @@ namespace explode
 		}
 		m_expected_size = extra_data_start2 - exe_data_start2;
 		m_code_offs = static_cast <uint32_t>(extra_data_start + exe_data_start2);
+		for (int i = 0; i < exe_file::MAX_HEADER_VAL; i++)
+		{
+			m_header[i] = inner[static_cast <exe_file::header_t> (i)];
+		}
 	}
 	// ------------------------------------------------------------
 	bool knowledge_dynamics::accept(input_exe_file& inp)
@@ -52,6 +56,7 @@ namespace explode
 	void knowledge_dynamics::unpack(output_exe_file& oexe)
 	{
 		m_file.seek(m_code_offs);
+		std::size_t code_size = m_file.bytes_remains();
 
 		static const std::size_t MBUFFER_SIZE = 1024;
 		static const std::size_t MBUFFER_EDGE = (MBUFFER_SIZE - 3);
@@ -105,7 +110,15 @@ namespace explode
 				for (std::size_t j = 0; j < bytes_extra; j++) mbuffer[j] = mbuffer[bytes_left + j];
 
 				/* Read in the rest */
-				m_file.read_buff(mbuffer, bytes_left);
+				std::size_t remains = m_file.bytes_remains();
+				if (remains < bytes_left)
+				{
+					m_file.read_buff(mbuffer + bytes_extra, remains);
+				}
+				else
+				{
+					m_file.read_buff(mbuffer + bytes_extra, bytes_left);
+				}
 				
 
 				/* Reset cursor */
@@ -208,6 +221,12 @@ namespace explode
 				dict_range *= 2;
 			}
 		}
+		oexe[exe_file::INITIAL_CS] = m_header[exe_file::INITIAL_CS];
+		oexe[exe_file::INITIAL_IP] = m_header[exe_file::INITIAL_IP];
+		oexe[exe_file::INITIAL_SS] = m_header[exe_file::INITIAL_SS];
+		oexe[exe_file::INITIAL_SP] = m_header[exe_file::INITIAL_SP];
+		oexe[exe_file::MAX_MEM_PARA] = m_header[exe_file::MAX_MEM_PARA];
+		oexe[exe_file::MIN_MEM_PARA] = (m_expected_size + 0x20) / 64;
 		oexe.eval_structures();
 	}
 	// ------------------------------------------------------------

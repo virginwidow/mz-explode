@@ -270,6 +270,7 @@ static std::basic_ostream <char>& operator << (std::basic_ostream<char> &s, cons
 #include "explode/exe_file.hh"
 #include "explode/unpklite.hh"
 #include "explode/unlzexe.hh"
+#include "explode/knowledge_dynamics.hh"
 
 #include "unittest/md5.h"
 
@@ -286,6 +287,10 @@ static std::basic_ostream <char>& operator << (std::basic_ostream<char> &s, cons
 #include "unittest/z90.cc"
 #include "unittest/z91.cc"
 #include "unittest/z91e.cc"
+
+#include "unittest/dot.cc"
+#include "unittest/lex.cc"
+#include "unittest/tntega.cc"
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
@@ -307,6 +312,10 @@ static const char* digest_lzexe_91   = "f38e4c688fcd8f3d4f102dc5e2b8bb0f";
 static const char* digest_lzexe_91_E = "f38e4c688fcd8f3d4f102dc5e2b8bb0f";
 static const char* digest_lzexe_90   = "620d7dce66a13ec7be84b9f390078aa6";
 
+
+static const char* digest_knowledge_dynamics_LEX = "03703e056977944b007eb2ecccf3f1c4";
+static const char* digest_knowledge_dynamics_DOT = "3b1429a7224c868b4725228b1a4ffb66";
+static const char* digest_knowledge_dynamics_TNT = "d813b5ac3095c24c3eba559bac22a32d";
 
 typedef unsigned char md5_digest[MD5_DIGEST_LENGTH];
 
@@ -333,6 +342,18 @@ struct tester < explode::unlzexe >
 		if (!explode::unlzexe::accept (iexe))
 		{
 			throw std::runtime_error("not a LZEXE");
+		}
+	}
+};
+
+template <>
+struct tester < explode::knowledge_dynamics >
+{
+	static void test(explode::input_exe_file& iexe)
+	{
+		if (!explode::knowledge_dynamics::accept(iexe))
+		{
+			throw std::runtime_error("not a Knowledge Dynaimcs");
 		}
 	}
 };
@@ -399,7 +420,7 @@ static void do_test(const char* test_name, const unsigned char* data, std::size_
 		s_ok = "FAILED";
 		col = RED;
 	}
-	std::cout << setcolour(GRAY) << "TEST #" << total_tests << ": " << test_name << " "
+	std::cout << setcolour(GRAY) << "TEST #" << std::dec << total_tests << ": " << test_name << " "
 		<< setcolour(col) << s_ok << setcolour(GRAY) << std::endl;
 	if (!ok)
 	{
@@ -423,7 +444,7 @@ static void do_test(const char* test_name, const unsigned char* data, std::size_
 
 #define PKLITE_TEST(NAME) do_test <explode::unpklite>("PKLITE-" STRINGIZE(NAME), CONCATENATE (data::pklite_, NAME), CONCATENATE(CONCATENATE (data::pklite_, NAME), _len), CONCATENATE(digest_, CONCATENATE (pklite_, NAME)))
 #define LZEXE_TEST(NAME) do_test <explode::unlzexe>("LZEXE-" STRINGIZE(NAME), CONCATENATE (data::z, NAME), CONCATENATE(CONCATENATE (data::z, NAME), _len), CONCATENATE(digest_, CONCATENATE (lzexe_, NAME)))
-
+#define KD_TEST(NAME) do_test <explode::knowledge_dynamics>("KD-" STRINGIZE(NAME), CONCATENATE (data::knowledge_dynamics_, NAME), CONCATENATE(CONCATENATE (data::knowledge_dynamics_, NAME), _len), CONCATENATE(digest_, CONCATENATE (knowledge_dynamics_, NAME)))
 int main(int argc, char* argv[])
 {
 
@@ -439,6 +460,10 @@ int main(int argc, char* argv[])
 	LZEXE_TEST(90);
 	LZEXE_TEST(91);
 	LZEXE_TEST(91_E);
+
+	KD_TEST(DOT);
+	KD_TEST(TNT);
+	KD_TEST(LEX);
 
 	const colour col = (failed_tests == 0) ? GREEN : RED;
 	

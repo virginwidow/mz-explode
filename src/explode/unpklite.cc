@@ -359,6 +359,26 @@ namespace
 // =====================================================================
 namespace explode 
 {
+	bool unpklite::accept(input_exe_file& inp)
+	{
+		input& m_file = inp.file();
+		static const offset_type pklite_ver_offset = 2 * 0xF;
+		m_file.seek(pklite_ver_offset);
+
+		union
+		{
+			char     bytes[4];
+			uint16_t words[2];
+		} u;
+
+		m_file.read_buff(u.bytes, 2 * sizeof(uint16_t));
+
+		u.words[0] = byte_order::from_little_endian(u.words[0]);
+		u.words[1] = byte_order::from_little_endian(u.words[1]);
+
+		return (u.words[0] == 0x4B50) && (u.words[1] == 0x494C);
+	}
+	// =================================================================
   unpklite::unpklite (input_exe_file& inp)
     : m_file (inp.file ()),
       m_exe_file (inp),
@@ -382,6 +402,14 @@ namespace explode
     const uint32_t header_length_para = inp [exe_file::HEADER_SIZE_PARA];
     m_header_length = (header_length_para & 0xFFFF) << 4;
     _read_parameters ();
+
+	m_ver_minor = static_cast <uint16_t> (m_h_pklite_info & 0xFF);
+	m_ver_major = static_cast <uint16_t> ((m_h_pklite_info & 0x0F00) >> 8);
+	
+	const uint16_t pklite_method = static_cast <uint16_t> (m_h_pklite_info & 0x1000);
+	m_extended = (pklite_method == 0);
+	const uint16_t pklite_compression_model = static_cast <uint16_t> (m_h_pklite_info & 0x2000);
+	m_large_exe = (pklite_compression_model != 0);
   }
   // ------------------------------------------------------------------
   void unpklite::unpack (output_exe_file& oexe)
@@ -539,11 +567,6 @@ namespace explode
   bool unpklite::has_checksum () const
   {
     return m_has_checksum;
-  }
-  // ------------------------------------------------------------------
-  uint16_t unpklite::pklite_info () const
-  {
-    return m_h_pklite_info;
   }
   // ------------------------------------------------------------------
   void unpklite::_read_parameters ()
@@ -920,6 +943,26 @@ namespace explode
 	m_data_offset = temp;
       }
    
+  }
+  // ---------------------------------------------------------------------
+  uint16_t unpklite::ver_minor() const
+  {
+	  return m_ver_minor;
+  }
+  // ---------------------------------------------------------------------
+  uint16_t unpklite::ver_major() const
+  {
+	  return m_ver_major;
+  }
+  // ---------------------------------------------------------------------
+  bool unpklite::large_exe() const
+  {
+	  return m_large_exe;
+  }
+  // ---------------------------------------------------------------------
+  bool unpklite::extended() const
+  {
+	  return m_extended;
   }
 } // ns explode
 

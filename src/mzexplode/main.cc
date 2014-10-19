@@ -70,24 +70,13 @@ PRIVATE void dump_exe_parameters(std::ostream& os,
 	using namespace explode;
 
 	dump_exe_parameters(os, ifile, header, true);
+		
+	dump_info(os, "PKLITE version", decoder.ver_major (), decoder.ver_minor (), false);
 
-	const uint16_t PKLITE_INFO = decoder.pklite_info();
-
-	const uint16_t pklite_ver_minor = static_cast <uint16_t> (PKLITE_INFO & 0xFF);
-	const uint16_t pklite_ver_major = static_cast <uint16_t> ((PKLITE_INFO & 0x0F00) >> 8);
-
-	dump_info(os, "PKLITE version", pklite_ver_major, pklite_ver_minor, false);
-
-
-	const uint16_t pklite_method = static_cast <uint16_t> (PKLITE_INFO & 0x1000);
-
-	const char* s_pklite_method = (pklite_method == 0) ? "Standard" : "Extra";
+	const char* s_pklite_method = (!decoder.extended ()) ? "Standard" : "Extra";
 	dump_info(os, "Compression Technique", s_pklite_method);
 
-	const uint16_t pklite_compression_model = static_cast <uint16_t> (PKLITE_INFO & 0x2000);
-
-
-	const char* s_pklite_compression_model = (pklite_compression_model == 0) ? "Small .EXE" : "Large .EXE";
+	const char* s_pklite_compression_model = (!decoder.large_exe ()) ? "Small .EXE" : "Large .EXE";
 	dump_info(os, "Compression Model", s_pklite_compression_model);
 
 
@@ -159,13 +148,13 @@ int main(int argc, char* argv[])
 	{
 		explode::file_input input(ifile);
 		explode::input_exe_file iexe(input);
-		if (iexe.is_lzexe())
+		if (explode::unlzexe::accept (iexe))
 		{
 			decode <explode::unlzexe>(iexe, ifile, ofile);
 		}
 		else
 		{
-			if (iexe.is_pklite())
+			if (explode::unpklite::accept (iexe))
 			{
 				decode <explode::unpklite>(iexe, ifile, ofile);
 			}

@@ -17,6 +17,7 @@ namespace explode
 
     void unpack (output_exe_file& oexe);
     
+	static bool accept(input_exe_file& inp);
     
     uint32_t decomp_size () const;
   private:

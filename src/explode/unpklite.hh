@@ -15,6 +15,8 @@ namespace explode
   public:
     explicit unpklite (input_exe_file& inp);
 
+	static bool accept(input_exe_file& inp);
+
     void unpack (output_exe_file& oexe);
     
     uint32_t header_length () const;
@@ -24,8 +26,12 @@ namespace explode
     uint32_t data_offset () const;
     bool     uncompressed_region () const;
     bool     has_checksum () const;
-    uint16_t pklite_info () const;
+    
 
+	uint16_t ver_minor() const;
+	uint16_t ver_major() const;
+	bool     large_exe() const;
+	bool     extended() const;
   private:
     void _read_parameters ();
   private:
@@ -43,6 +49,11 @@ namespace explode
     bool     m_uncompressed_region;
     bool     m_has_checksum;
     uint16_t m_h_pklite_info;
+
+	uint16_t m_ver_minor;
+	uint16_t m_ver_major;
+	bool     m_extended;
+	bool     m_large_exe;
 
   };
 } // ns explode

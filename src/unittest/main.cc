@@ -318,7 +318,7 @@ struct tester < explode::unpklite >
 {
 	static void test(explode::input_exe_file& iexe)
 	{
-		if (!iexe.is_pklite())
+		if (!explode::unpklite::accept (iexe))
 		{
 			throw std::runtime_error("not a PKLITE");
 		}
@@ -330,7 +330,7 @@ struct tester < explode::unlzexe >
 {
 	static void test(explode::input_exe_file& iexe)
 	{
-		if (!iexe.is_lzexe())
+		if (!explode::unlzexe::accept (iexe))
 		{
 			throw std::runtime_error("not a LZEXE");
 		}
@@ -343,7 +343,7 @@ static void eval_digest(const unsigned char* data, std::size_t length, md5_diges
 {
 	explode::inmem_input input(data, length);
 	explode::input_exe_file iexe(input);
-	
+
 	tester <DECODER>::test(iexe);
 
 	DECODER decoder(iexe);
@@ -368,9 +368,6 @@ static void do_test(const char* test_name, const unsigned char* data, std::size_
 	{
 		std::vector <char> out_buff;
 		eval_digest <DECODER>(data, length, dgst, out_buff);
-		
-		
-
 
 		for (int n = 0; n < MD5_DIGEST_LENGTH; n++)
 		{

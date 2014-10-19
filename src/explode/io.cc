@@ -73,9 +73,20 @@ namespace explode
     return static_cast <offset_type> (end - current);
   }
   // -------------------------------------------------------------
+#if defined(__SUNPRO_CC)
+#if defined(_FILE_OFFSET_BITS) && (_FILE_OFFSET_BITS == 64)
+#define fseek_offset fseeko64
+#else 
+#define fseek_offset fseeko
+#endif
+#else
+#define fseek_offset fseek
+#error ZOPA
+#endif
+
   void file_input::seek (offset_type offset)
   {
-    if (fseek (m_file, offset, SEEK_SET) != 0)
+    if (fseek_offset (m_file, offset, SEEK_SET) != 0)
       {
 	throw input_error ();
       }
@@ -169,7 +180,7 @@ namespace explode
   // -------------------------------------------------------------
   void file_output::seek (offset_type offset)
   {
-    if (fseek (m_file, offset, SEEK_SET) != 0)
+    if (fseek_offset (m_file, offset, SEEK_SET) != 0)
       {
 	throw input_error ();
       }

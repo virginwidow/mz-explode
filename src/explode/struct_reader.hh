@@ -124,8 +124,8 @@ namespace explode
 				m_word = word();
 				m_count = 0x10;
 			}
-			uint16_t x = m_word & 1;
-			m_word = (uint16_t)(m_word >> 1);
+			uint16_t x = static_cast <uint16_t> (m_word & 1);
+			m_word = static_cast <uint16_t>(m_word >> 1);
 			m_count--;
 			if (m_count == 0)
 			{
@@ -136,7 +136,7 @@ namespace explode
 		}
 		uint8_t count() const
 		{
-			return (uint8_t)(m_count & 0xFF);
+			return static_cast <uint8_t>(m_count & 0xFF);
 		}
 
 	private:

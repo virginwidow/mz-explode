@@ -59,15 +59,13 @@ namespace explode
   struct rellocation
   {
 	  rellocation()
-		  : seg(0),
-		  rel(0)
+		  : rel (0), seg (0)
 	  {
 
 	  }
 
 	  rellocation(uint16_t s, uint16_t r)
-		  : seg(s),
-		  rel(r)
+	    : rel(r), seg(s)
 	  {
 
 	  }

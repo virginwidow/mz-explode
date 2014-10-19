@@ -28,11 +28,6 @@ static void dump_info (std::ostream& os, const char* name, uint16_t seg, uint16_
     }
 }
 // ---------------------------------------------------------------------------------------------------------
-static void dump_info (std::ostream& os, const char* name, const char* txt)
-{
-  os << std::left << std::setw (32) << name << ":\t" << txt << std::endl;
-}
-// ---------------------------------------------------------------------------------------------------------
 static void dump_exe_parameters (std::ostream& os, const explode::exe_file& header)
 {
   using namespace explode;
@@ -74,7 +69,7 @@ static void dump_extra(const explode::exe_file& header, const char* ofile, explo
 		std::cout << "No extra information found" << std::endl;
 		return;
 	}
-	const std::size_t sz = rellocs_offset - end_of_header;
+	const std::size_t sz = static_cast <std::size_t> (rellocs_offset - end_of_header);
 	input.seek(end_of_header);
 	std::vector <char> extra(sz);
 	input.read(&extra [0], sz);
@@ -188,7 +183,7 @@ static bool compare_rellocs(explode::input_exe_file& iexe1, explode::input_exe_f
 
 		}
 	}
-	if (first = false)
+	if (first == false)
 	{
 		return false;
 	}
@@ -200,7 +195,7 @@ static void load_code(const explode::exe_file& header, explode::input& input, st
 {
 	const explode::offset_type end_of_mz_header = header[explode::exe_file::HEADER_SIZE_PARA] * 16;
 	input.seek(end_of_mz_header);
-	const std::size_t sz = input.bytes_remains();
+	const std::size_t sz = static_cast <std::size_t> (input.bytes_remains());
 	out.resize(sz);
 	input.read(&out[0], sz);
 }
@@ -237,8 +232,8 @@ static bool compare_code(explode::input_exe_file& iexe1, explode::input_exe_file
 				std::cout << "Different bytes" << std::endl;
 				first = false;
 			}
-			std::cout << "offset " << i << ": " << ((int)(code1[i]) & 0xFF) << " != "
-				<< ((int)(code2[i]) & 0xFF) << std::endl;
+			std::cout << "offset " << i << ": " << (static_cast <int>(code1[i]) & 0xFF) << " != "
+				<< (static_cast <int>(code2[i]) & 0xFF) << std::endl;
 		}
 	}
 	if (first == false)
@@ -255,7 +250,7 @@ static bool compare_headers(explode::input_exe_file& iexe1, explode::input_exe_f
 	bool ok = true;
 	for (int i = 0; i < explode::exe_file::MAX_HEADER_VAL; i++)
 	{
-		explode::exe_file::header_t h = (explode::exe_file::header_t)i;
+	  explode::exe_file::header_t h = static_cast <explode::exe_file::header_t> (i);
 
 		if (iexe1[h] != iexe2[h])
 		{
@@ -374,7 +369,7 @@ int main (int argc, char* argv [])
 	  case eCOMPARE:
 		  compare_files(ifile, ofile);
 		  break;
-	  default:
+	  case eDUMP_NONE:
 		  assert(false);
 	  }
     }

@@ -252,13 +252,18 @@ struct setcolour
 	}
 };
 
-std::basic_ostream <char>& operator << (std::basic_ostream<char> &s, const setcolour &ref)
+static std::basic_ostream <char>& operator << (std::basic_ostream<char> &s, const setcolour &ref)
 {
 	s << ref._code;
 	return s;
 }
 
 
+#endif
+
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
 #include "explode/io.hh"
@@ -281,6 +286,10 @@ std::basic_ostream <char>& operator << (std::basic_ostream<char> &s, const setco
 #include "unittest/z90.cc"
 #include "unittest/z91.cc"
 #include "unittest/z91e.cc"
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
 static int total_tests = 0;
 static int failed_tests = 0;
@@ -344,18 +353,10 @@ static void eval_digest(const unsigned char* data, std::size_t length, md5_diges
 	explode::inmem_output out(out_buff);
 	fo.write(out);
 
-	static int k = 1;
-
-	std::ostringstream os;
-	os << k << ".dump";
-	FILE* f = fopen (os.str ().c_str (), "wb");
-	fwrite ( &out_buff[0], (unsigned long)out_buff.size (), 1, f);
-	fclose (f);
-	k++;
 
 	MD5_CTX c;
 	MD5_Init(&c);
-	MD5_Update(&c, &out_buff[0], (unsigned long)out_buff.size ());
+	MD5_Update(&c, &out_buff[0], static_cast <unsigned long> (out_buff.size ()));
 	MD5_Final(digest, &c);
 }
 template <typename DECODER>
@@ -411,7 +412,7 @@ static void do_test(const char* test_name, const unsigned char* data, std::size_
 		for (int n = 0; n < MD5_DIGEST_LENGTH; n++)
 		{
 			std::cout << std::setw(2) << std::setfill('0') << std::hex
-				<< ((int)dgst[n] & 0xFF);
+				  << (static_cast <int> (dgst[n]) & 0xFF);
 		}
 		std::cout << std::endl;
 	}

@@ -13,7 +13,7 @@ namespace explode
   class unlzexe
   {
   public:
-    unlzexe (input_exe_file& inp);
+    explicit unlzexe (input_exe_file& inp);
 
     void unpack (output_exe_file& oexe);
     

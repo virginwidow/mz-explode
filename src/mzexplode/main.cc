@@ -25,12 +25,12 @@ static void dump_info(std::ostream& os, const char* name, uint16_t seg, uint16_t
 	}
 }
 // ---------------------------------------------------------------------------------------------------------
-void dump_info(std::ostream& os, const char* name, const char* txt)
+static void dump_info(std::ostream& os, const char* name, const char* txt)
 {
 	os << std::left << std::setw(32) << name << ":\t" << txt << std::endl;
 }
 // ---------------------------------------------------------------------------------------------------------
-void dump_exe_parameters(std::ostream& os,
+static void dump_exe_parameters(std::ostream& os,
 	const char* file,
 	const explode::exe_file& header,
 	bool is_input)
@@ -56,7 +56,7 @@ void dump_exe_parameters(std::ostream& os,
 	dump_info(os, "Relocation entries", header[exe_file::RELLOCATION_ENTRIES]);
 }
 // ---------------------------------------------------------------------------------------------------------
-void dump_exe_parameters(std::ostream& os,
+static void dump_exe_parameters(std::ostream& os,
 	const char* ifile,
 	const explode::exe_file& header,
 	const explode::unpklite& decoder)
@@ -67,18 +67,18 @@ void dump_exe_parameters(std::ostream& os,
 
 	const uint16_t PKLITE_INFO = decoder.pklite_info();
 
-	const uint16_t pklite_ver_minor = PKLITE_INFO & 0xFF;
-	const uint16_t pklite_ver_major = (PKLITE_INFO & 0x0F00) >> 8;
+	const uint16_t pklite_ver_minor = static_cast <uint16_t> (PKLITE_INFO & 0xFF);
+	const uint16_t pklite_ver_major = static_cast <uint16_t> ((PKLITE_INFO & 0x0F00) >> 8);
 
 	dump_info(os, "PKLITE version", pklite_ver_major, pklite_ver_minor, false);
 
 
-	const uint16_t pklite_method = PKLITE_INFO & 0x1000;
+	const uint16_t pklite_method = static_cast <uint16_t> (PKLITE_INFO & 0x1000);
 
 	const char* s_pklite_method = (pklite_method == 0) ? "Standard" : "Extra";
 	dump_info(os, "Compression Technique", s_pklite_method);
 
-	const uint16_t pklite_compression_model = PKLITE_INFO & 0x2000;
+	const uint16_t pklite_compression_model = static_cast <uint16_t> (PKLITE_INFO & 0x2000);
 
 
 	const char* s_pklite_compression_model = (pklite_compression_model == 0) ? "Small .EXE" : "Large .EXE";
@@ -109,7 +109,7 @@ void dump_exe_parameters(std::ostream& os,
 	dump_info(os, "Offset to compressed image", decoder.data_offset());
 }
 // ---------------------------------------------------------------------------------------------------------
-void dump_exe_parameters(std::ostream& os,
+static void dump_exe_parameters(std::ostream& os,
 	const char* ifile,
 	const explode::exe_file& header,
 	const explode::unlzexe& /*decoder*/)
@@ -117,7 +117,7 @@ void dump_exe_parameters(std::ostream& os,
 	dump_exe_parameters(os, ifile, header, true);
 }
 // ---------------------------------------------------------------------------------------------------------
-void dump_exe_parameters(std::ostream& os,
+static void dump_exe_parameters(std::ostream& os,
 	const char* ifile,
 	const explode::exe_file& header,
 	const explode::unexepack& /*decoder*/)
@@ -129,7 +129,7 @@ template <typename DECODER>
 static void decode(explode::input_exe_file& iexe, const char* ifile, const char* ofile)
 {
 	DECODER decoder(iexe);
-	dump_exe_parameters(std::cout, ifile, (explode::exe_file&)iexe, decoder);
+	dump_exe_parameters(std::cout, ifile, dynamic_cast <explode::exe_file&> (iexe), decoder);
 	explode::full_exe_file fo(decoder.decomp_size());
 	decoder.unpack(fo);
 	std::cout << std::endl;

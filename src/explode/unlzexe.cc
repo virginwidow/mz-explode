@@ -22,10 +22,10 @@ static void build_rellocs_90 (explode::input& file, std::vector <explode::relloc
 	  uint16_t offs;
 	  file.read (offs);
 	  offs = explode::byte_order::from_little_endian(offs);
-	  rellocs.push_back (explode::rellocation (seg, offs));
+	  rellocs.push_back (explode::rellocation (static_cast <uint16_t> (seg), offs));
 	}
-      seg = (int16_t)(seg + 0x1000);
-    } while (seg != (int16_t)(0xF000+0x1000));
+      seg = static_cast <int16_t> (seg + 0x1000);
+    } while (seg != static_cast <int16_t>(0xF000+0x1000));
 }
 // ----------------------------------------------------------------
 static void build_rellocs_91 (explode::input& file, std::vector <explode::rellocation>& rellocs)
@@ -37,13 +37,13 @@ static void build_rellocs_91 (explode::input& file, std::vector <explode::relloc
     {
       uint8_t s;
       file.read (s);
-      span = s & 0xFF;
+      span = static_cast <int16_t> (static_cast <uint16_t> (s) & 0xFF);
       if (span == 0)
 	{
 	  file.read(span);
 	  if (span == 0)
 	    {
-	      seg = (int16_t)(seg + 0x0FFF);
+	      seg = static_cast <int16_t>(seg + 0x0FFF);
 	      continue;
 	    }
 	  else
@@ -54,10 +54,10 @@ static void build_rellocs_91 (explode::input& file, std::vector <explode::relloc
 		}
 	    }
 	}
-      offs = (int16_t)(offs + span);
-      seg = (int16_t)(seg + (int16_t)((offs & ~0x0f)>>4));
+      offs = static_cast <int16_t>(offs + span);
+      seg = static_cast <int16_t>(seg + static_cast <int16_t>((offs & ~0x0f)>>4));
       offs &= 0x0f;
-      rellocs.push_back (explode::rellocation (seg, offs));
+      rellocs.push_back (explode::rellocation (static_cast <uint16_t> (seg), static_cast <uint16_t>(offs)));
     };
 }
 
@@ -78,7 +78,7 @@ static uint32_t unpak_code(explode::output_exe_file& oexe, explode::input& input
 	  oexe.code_put(opos, data, 0x2000);
 	  opos += 0x2000;
 	  p -= 0x2000;
-	  std::memmove (data, data + 0x2000, p - data);
+	  std::memmove (data, data + 0x2000, static_cast <std::size_t> (p - data));
 	}
       if (bitstream.bit())
 	{
@@ -89,20 +89,20 @@ static uint32_t unpak_code(explode::output_exe_file& oexe, explode::input& input
 
       if (!bitstream.bit())
 	{
-	  len = (int16_t)(bitstream.bit() << 1);
-	  len = (int16_t)(len | bitstream.bit());
-	  len = (int16_t)(len + 2);
-	  span = ((uint16_t)bitstream.byte() & 0xFFFF) | 0xFF00;
+	  len = static_cast <int16_t>(bitstream.bit() << 1);
+	  len = static_cast <int16_t>(len | bitstream.bit());
+	  len = static_cast <int16_t>(len + 2);
+	  span = static_cast <int16_t>((static_cast <uint16_t>(bitstream.byte()) & 0xFFFF) | 0xFF00);
 	}
       else
 	{
-	  span = (uint8_t)((uint16_t)bitstream.byte() & 0xFFFF);
-	  len = (uint16_t)bitstream.byte() & 0xFF;
-	  span = (int16_t)(span | (int16_t)(((len & ~0x07) << 5) | 0xe000));
-	  len = (int16_t)((len & 0x07) + 2);
+	  span = static_cast<uint8_t>(static_cast<uint16_t> (bitstream.byte()) & 0xFFFF);
+	  len = static_cast <int16_t>(static_cast <uint16_t>(bitstream.byte()) & 0xFF);
+	  span = static_cast <int16_t>(span | static_cast<int16_t>(((len & ~0x07) << 5) | 0xe000));
+	  len = static_cast<int16_t>((len & 0x07) + 2);
 	  if (len == 2)
 	    {
-	      len = (uint16_t)bitstream.byte() & 0xFF;
+	      len = static_cast <int16_t> (static_cast <uint16_t> (bitstream.byte()) & 0xFF);
 	      if (len == 0)
 		{
 		  break;
@@ -124,11 +124,12 @@ static uint32_t unpak_code(explode::output_exe_file& oexe, explode::input& input
     }
   if (p != data)
     {
-      oexe.code_put(opos, data, p-data);
-      opos += (p-data);
+      const std::size_t sz = static_cast <std::size_t> (p-data);
+      oexe.code_put(opos, data, sz);
+      opos += sz;
     }
 
-  return (uint32_t)opos;
+  return static_cast <uint32_t> (opos);
 }
 // ----------------------------------------------------------------
 namespace explode
@@ -185,14 +186,15 @@ namespace explode
 
     if (m_ver == 90)
       {
-	m_rellocs_offset = (uint32_t)(header_pos + 0x19D);
+	m_rellocs_offset = static_cast <uint32_t>(header_pos + 0x19D);
       }
     else
       {
-	m_rellocs_offset = (uint32_t)(header_pos + 0x158);
+	m_rellocs_offset = static_cast <uint32_t>(header_pos + 0x158);
       }
-    m_code_offset = ((uint32_t)inp[exe_file::INITIAL_CS] - (uint32_t)m_header[eCOMPRESSED_SIZE] +
-		     (uint32_t)inp[exe_file::HEADER_SIZE_PARA]) << 4;
+    m_code_offset = (static_cast <uint32_t>(inp[exe_file::INITIAL_CS]) - 
+		     static_cast <uint32_t>(m_header[eCOMPRESSED_SIZE]) +
+		     static_cast <uint32_t>(inp[exe_file::HEADER_SIZE_PARA])) << 4;
   }
   // ------------------------------------------------------------------------
   void unlzexe::unpack (output_exe_file& oexe)
@@ -220,21 +222,22 @@ namespace explode
     oexe [exe_file::INITIAL_SP]    = m_header [eSP];
     oexe [exe_file::RELLOC_OFFSET] = 0x1C;
 
-    uint32_t fpos = (uint32_t)(0x1C + oexe.rellocations().size()*4);
-    uint32_t i = (0x200 - (int)fpos) & 0x1ff;	/* v0.7 */
-    oexe[exe_file::HEADER_SIZE_PARA] = (uint16_t)((fpos + i) >> 4);	/* v0.7 */
+    uint32_t fpos = static_cast <uint32_t>(0x1C + oexe.rellocations().size()*4);
+    uint32_t i = (0x200 - static_cast <int> (fpos)) & 0x1ff;
+    oexe[exe_file::HEADER_SIZE_PARA] = static_cast <uint16_t>((fpos + i) >> 4);
 
     if (m_exe_file[exe_file::MAX_MEM_PARA] != 0)
       {
-	oexe[exe_file::MIN_MEM_PARA] -= m_header[eINC_SIZE] + ((m_header[eDECOMPRESSOR_SIZE] + 16 - 1) >> 4) + 9;
-	if (m_exe_file[exe_file::MAX_MEM_PARA] != (uint16_t)0xFFFF)
+	int32_t delta = m_header[eINC_SIZE] + ((m_header[eDECOMPRESSOR_SIZE] + 16 - 1) >> 4) + 9;
+	oexe[exe_file::MIN_MEM_PARA] = static_cast <uint16_t>(oexe[exe_file::MIN_MEM_PARA] - delta);
+	if (m_exe_file[exe_file::MAX_MEM_PARA] != static_cast <uint16_t>(0xFFFF))
 	  {
-	    oexe[exe_file::MAX_MEM_PARA] = (uint16_t)(oexe[exe_file::MAX_MEM_PARA] - (m_header[eINC_SIZE] - oexe[exe_file::MIN_MEM_PARA]));
+	    oexe[exe_file::MAX_MEM_PARA] = static_cast <uint16_t>(oexe[exe_file::MAX_MEM_PARA] - (m_header[eINC_SIZE] - oexe[exe_file::MIN_MEM_PARA]));
 	  }
       }
 
-    oexe[exe_file::NUM_OF_BYTES_IN_LAST_PAGE] = ((uint16_t)load_size + (oexe[exe_file::HEADER_SIZE_PARA] << 4)) & 0x1ff;
-    oexe[exe_file::NUM_OF_PAGES] = (uint16_t)((load_size + ((uint32_t)oexe[exe_file::HEADER_SIZE_PARA] << 4) + 0x1ff) >> 9);
+    oexe[exe_file::NUM_OF_BYTES_IN_LAST_PAGE] = static_cast <uint16_t> ((static_cast <uint16_t> (load_size) + (oexe[exe_file::HEADER_SIZE_PARA] << 4)) & 0x1ff);
+    oexe[exe_file::NUM_OF_PAGES] = static_cast <uint16_t>((load_size + (static_cast <uint32_t>(oexe[exe_file::HEADER_SIZE_PARA]) << 4) + 0x1ff) >> 9);
 
 
     

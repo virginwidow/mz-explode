@@ -13,7 +13,7 @@ namespace explode
 	class unexepack
 	{
 	public:
-		unexepack(input_exe_file& inp);
+		explicit unexepack(input_exe_file& inp);
 
 		void unpack(output_exe_file& oexe);
 		uint32_t decomp_size() const;

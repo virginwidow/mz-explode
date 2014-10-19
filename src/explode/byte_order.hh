@@ -79,13 +79,13 @@ namespace explode
   //
   inline uint16_t byte_order::flip_bytes(uint16_t value)
   {
-    return (uint16_t)(((value >> 8) & 0x00FF) | ((value << 8) & 0xFF00));
+    return static_cast <uint16_t>(((value >> 8) & 0x00FF) | ((value << 8) & 0xFF00));
   }
 
 
   inline int16_t byte_order::flip_bytes(int16_t value)
   {
-    return int16_t(flip_bytes(uint16_t(value)));
+    return int16_t(flip_bytes(static_cast <uint16_t>(value)));
   }
 
 
@@ -98,7 +98,7 @@ namespace explode
 
   inline int32_t byte_order::flip_bytes(int32_t value)
   {
-    return int32_t(flip_bytes(uint32_t(value)));
+    return int32_t(flip_bytes(static_cast <uint32_t>(value)));
   }
 
 

@@ -1,6 +1,7 @@
 #include <vector>
 #include <cstring>
 #include <iostream>
+
 #include "explode/unpklite.hh"
 #include "explode/exe_file.hh"
 #include "explode/io.hh"
@@ -11,7 +12,7 @@ namespace
 {
   bool is_supported (uint16_t h_pklite_info)
   {
-    uint16_t h_pklite_info_3f = h_pklite_info & 0xFFF;
+    uint16_t h_pklite_info_3f = static_cast <uint16_t> (h_pklite_info & 0xFFF);
 
     switch (h_pklite_info_3f)
       {
@@ -54,7 +55,7 @@ namespace
 	    break;
 	  case 0x0b:
 	    {
-	      length_code = 0x0A + static_cast <uint16_t>(f.byte ());
+	      length_code = static_cast <uint16_t>(0x0A + static_cast <uint16_t>(f.byte ()));
 	      if (length_code == 0x109)
 		{
 		  length_code = 0xFFFF;
@@ -72,8 +73,8 @@ namespace
 	    length_code = 4;
 	    break;
 	  case 0xd:
-	    break;
 	    length_code = 5;
+	    break;
 	  case 0x1c:
 	    length_code = 6;
 	    break;
@@ -87,7 +88,7 @@ namespace
 	    length_code = 9;
 	    break;
 	  default:
-	    length_code = f.bit () | (length_code << 1);
+	    length_code = static_cast <uint16_t> (f.bit () | (length_code << 1));
 	    handeled = false;
 	    break;
 	  }
@@ -143,7 +144,7 @@ namespace
 	    break;
 	  case 0x5c:
 	    {
-	      length_code = 0x19 + static_cast <uint16_t>(f.byte ());
+	      length_code = static_cast <uint16_t> (0x19 + static_cast <uint16_t>(f.byte ()));
 	      if (length_code == 0x118)
 		{
 		  length_code = 0xFFFF;
@@ -198,7 +199,7 @@ namespace
 	    length_code = 0x18;
 	    break;
 	  default:
-	    length_code = f.bit () | (length_code << 1);
+	    length_code = static_cast <uint16_t> (f.bit () | (length_code << 1));
 	    handeled = false;
 	  } // end of switch
 	if (handeled)
@@ -223,11 +224,11 @@ namespace
 	    return 0;
 	  }
 	//	loc_4b6a:;
-	offs = f.bit () | (offs << 1);
+	offs = static_cast <uint16_t> (f.bit () | (offs << 1));
 	// 4bb9
-	offs = f.bit () | (offs << 1);
+	offs = static_cast <uint16_t> (f.bit () | (offs << 1));
 	// 4c08
-	offs = f.bit () | (offs << 1);
+	offs = static_cast <uint16_t> (f.bit () | (offs << 1));
 
 	switch (offs)
 	  {
@@ -240,7 +241,7 @@ namespace
 	    return 0x200;
 	  default:
 	    // 4c79
-	    offs = f.bit () | (offs << 1);
+	    offs = static_cast <uint16_t> (f.bit () | (offs << 1));
 	    switch (offs)
 	      {
 	      case 4:
@@ -253,7 +254,7 @@ namespace
 		return 0x600;
 	      default:
 		// 4d0c
-		offs = f.bit () | (offs << 1);
+		offs = static_cast <uint16_t> (f.bit () | (offs << 1));
 		switch (offs)
 		  {
 		  case 0x10:
@@ -272,31 +273,32 @@ namespace
 		    return 0xD00;
 		  default:
 		    // 4dd2
-		    offs = f.bit () | (offs << 1);
+		    offs = static_cast <uint16_t> (f.bit () | (offs << 1));
 		    if (offs >= 0x2E)
 		      {
-			return (offs & 0x1f) << 8;
+			return static_cast <uint16_t> ((offs & 0x1f) << 8);
 		      }
 		  }
 	      }
 	  }
       }
+#if !defined(__clang__)
     throw explode::decoder_error ("should not be here");
     return 0;
+#endif
   }
   // ===================================================================
-  explode::offset_type build_rellocs (uint16_t h_pklite_info,
-				      explode::struct_reader <uint32_t>& fr, 
-				      std::vector <explode::rellocation>& rellocs)
+  void build_rellocs (uint16_t h_pklite_info,
+		      explode::struct_reader <uint32_t>& fr, 
+		      std::vector <explode::rellocation>& rellocs)
   {
 
 	explode::struct_reader <uint16_t> f(fr.input ());
     uint32_t relocs_count = 0;
-    uint32_t cur_pos = f.tell ();
     uint16_t var_counter = 0;
     uint32_t length_code = 0;
     uint32_t has_bytes = 0;
-        
+    
     if ((h_pklite_info & 0x1000) == 0)
       {
 	while (true)
@@ -308,14 +310,14 @@ namespace
 		break;
 	      }
 	    
-	    var_counter = f () + (f () << 8);
+	    var_counter = f.word (); 
 	    
 	    has_bytes = 0;
 	    // 4fb6
 	    while (has_bytes < length_code)
 	      {
 		// 4f87
-		uint16_t rel = f () + (f () << 8);
+		uint16_t rel = f.word (); 
 		uint16_t seg = var_counter;
 		
 		rellocs.push_back (explode::rellocation (seg, rel));
@@ -330,7 +332,7 @@ namespace
 	var_counter = 0;
 	while (true)
 	  {
-	    length_code = f () + (f () << 8);
+	    length_code = f.word (); 
 	    if (length_code == 0xFFFF)
 	      {
 		break;
@@ -341,19 +343,17 @@ namespace
 		while (has_bytes < length_code)
 		  {
 		    //5013:;
-		    uint16_t rel = f () + (f () << 8);
-			uint16_t seg = var_counter;
+		    uint16_t rel = f.word (); 
+		    uint16_t seg = var_counter;
 		    rellocs.push_back (explode::rellocation (seg, rel));
 		    relocs_count++;
 		    has_bytes++;
 		  }
 	      }
 	    // 504d
-	    var_counter += 0x0FFF;
+	    var_counter = static_cast <uint16_t> (var_counter + 0x0FFF);
 	  }
       }
-    // 5055:
-    return cur_pos;
   }
 } // anonymous ns
 // =====================================================================
@@ -418,7 +418,7 @@ namespace explode
 		uint8_t byte = f.byte ();
 		if ((m_h_pklite_info & 0x01000) != 0)
 		  {
-		    byte = byte ^ f.count ();
+		    byte = static_cast <uint8_t> (byte ^ f.count ());
 		  }
 		code.push_back (byte);
 		bx++;
@@ -430,9 +430,9 @@ namespace explode
 		code.resize (0);
 		
 		// loc_4578
-		length_code = f.bit () | (length_code << 1);
+		length_code = static_cast <uint16_t> (f.bit () | (length_code << 1));
 		// loc_45c7
-		length_code = f.bit () | (length_code << 1);
+		length_code = static_cast <uint16_t> (f.bit () | (length_code << 1));
 		// loc_4616
 		adjust_length_code (length_code, f, m_uncompressed_region);
 		// 4989
@@ -454,7 +454,7 @@ namespace explode
 			    base_offs = get_base_offset (f);
 			  }
 			
-			base_offs += (uint16_t)f.byte ();
+			base_offs = static_cast <uint16_t>(base_offs + static_cast <uint16_t>(f.byte ()));
 			// should check here
 			uint32_t back_offs = bx - base_offs;
 			oexe.code_copy (back_offs, length_code, bx);
@@ -471,31 +471,25 @@ namespace explode
       }
     
     struct_reader <uint32_t> sr (m_file);
-    const offset_type rellocs_pos = build_rellocs (m_h_pklite_info, sr, oexe.rellocations ()); 
+    build_rellocs (m_h_pklite_info, sr, oexe.rellocations ()); 
 
     struct_reader <uint16_t> f (m_file);
     
-    oexe [exe_file::INITIAL_SS] = f () + (f () << 8);
-    oexe [exe_file::INITIAL_SP] = f () + (f () << 8);
-    oexe [exe_file::INITIAL_CS] = f () + (f () << 8);
+    oexe [exe_file::INITIAL_SS] = f.word ();
+    oexe [exe_file::INITIAL_SP] = f.word ();
+    oexe [exe_file::INITIAL_CS] = f.word ();
     oexe [exe_file::INITIAL_IP] = 0;
     uint32_t temp = ((m_decomp_size - bx) + 0x0F) >> 4;
-    oexe [exe_file::MIN_MEM_PARA] = (uint16_t) temp;
-    oexe [exe_file::CHECKSUM]   = f () + (f () << 8);
+    oexe [exe_file::MIN_MEM_PARA] = static_cast <uint16_t>(temp);
+    oexe [exe_file::CHECKSUM]   = f.word ();
     
-    uint16_t ax = (uint16_t) oexe.rellocations ().size ();
-    ax <<= 2;
+    const uint16_t relloc_bytes = static_cast <uint16_t> (oexe.rellocations ().size () * 4);
 
-    uint16_t cx = 0;
-    cx += 0x1FF;
-    cx += ax;
-    cx &= 0xFE00;
+    uint16_t par_size = static_cast <uint16_t> (relloc_bytes + 0x1FF);
+    par_size &= 0xFE00;
+    par_size = static_cast <uint16_t> (par_size >> 4);
 
-    uint16_t var_1e = cx; // 51c2
-
-    var_1e >>= 4;
-
-    oexe [exe_file::HEADER_SIZE_PARA] = var_1e;
+    oexe [exe_file::HEADER_SIZE_PARA] = par_size;
     
     union
     {

@@ -100,21 +100,21 @@ namespace explode
   // -------------------------------------------------------------
   offset_type inmem_input::tell()
   {
-	  return (offset_type)m_ptr;
+    return static_cast <offset_type> (m_ptr);
   }
   // -------------------------------------------------------------
   offset_type inmem_input::bytes_remains()
   {
-	  return (offset_type)m_size - (offset_type)m_ptr;
+    return static_cast <offset_type> (m_size) - static_cast <offset_type> (m_ptr);
   }
   // -------------------------------------------------------------
   void inmem_input::seek(offset_type offset)
   {
-	  if (offset >= (offset_type)m_size)
-	  {
-		  throw input_error();
-	  }
-	  m_ptr = offset;
+    if (offset >= static_cast <offset_type> (m_size))
+      {
+	throw input_error();
+      }
+    m_ptr = static_cast <std::size_t>(offset);
   }
   // =============================================================
   output::output ()
@@ -194,15 +194,15 @@ namespace explode
   // -------------------------------------------------------------
   offset_type inmem_output::tell()
   {
-	  return (offset_type)m_ptr;
+    return static_cast <offset_type> (m_ptr);
   }
   // -------------------------------------------------------------
   void inmem_output::seek(offset_type offset)
   {
-	  if (offset >= (off_t)m_buff.size())
-	  {
-		  throw input_error();
-	  }
-	  m_ptr = offset;
+    if (offset >= static_cast <off_t> (m_buff.size()))
+      {
+	throw input_error();
+      }
+    m_ptr = static_cast <std::size_t> (offset);
   }
 } // ns explode

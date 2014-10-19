@@ -5,11 +5,13 @@
 #include <vector>
 #include <iosfwd>
 
+#include "explode/proper_export.hh"
+
 namespace explode
 {
   class input;
 
-  class exe_file
+  class EXPLODE_API exe_file
   {
   public:
     enum header_t
@@ -36,10 +38,10 @@ namespace explode
     uint16_t m_header [MAX_HEADER_VAL];
   };
 
-  std::ostream& operator << (std::ostream& os, exe_file::header_t h);
+  EXPLODE_API std::ostream& operator << (std::ostream& os, exe_file::header_t h);
 
   // ==============================================================
-  class input_exe_file : public exe_file
+  class EXPLODE_API input_exe_file : public exe_file
   {
   public:
     explicit input_exe_file (input& file);
@@ -54,7 +56,7 @@ namespace explode
   // ==============================================================
   class output;
 
-  struct rellocation
+  struct EXPLODE_API rellocation
   {
 	  rellocation()
 		  : rel (0), seg (0)
@@ -71,7 +73,7 @@ namespace explode
 	  uint16_t seg;
   };
 
-  class output_exe_file : public exe_file
+  class EXPLODE_API output_exe_file : public exe_file
   {
   public:
     typedef std::vector <rellocation> rellocations_t;
@@ -107,7 +109,7 @@ namespace explode
     bool m_set [MAX_HEADER_VAL];
   };
   // ====================================================================
-  class full_exe_file : public output_exe_file
+  class EXPLODE_API full_exe_file : public output_exe_file
   {
   public:
 

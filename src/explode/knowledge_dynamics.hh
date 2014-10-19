@@ -5,11 +5,12 @@
 #include <stddef.h>
 
 #include "explode/exe_file.hh"
+#include "explode/proper_export.hh"
 
 namespace explode
 {
   class input;
-  class knowledge_dynamics
+  class EXPLODE_API knowledge_dynamics
   {
   public:
     explicit knowledge_dynamics(input_exe_file& inp);

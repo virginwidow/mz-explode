@@ -395,7 +395,7 @@ endmacro ()
 # ======================================================================
 if (EXPLODE_TOOLSET STREQUAL "intel")
   config_compile_and_linker_flags_name (IPP ICC)
-elseif (EXPLODE_TOOLSET STREQUAL "gcc44" OR EXPLODE_TOOLSET STREQUAL "gcc45" OR EXPLODE_TOOLSET STREQUAL "gcc46" OR EXPLODE_TOOLSET STREQUAL "gcc47")
+elseif (EXPLODE_TOOLSET STREQUAL "gcc44" OR EXPLODE_TOOLSET STREQUAL "gcc45" OR EXPLODE_TOOLSET STREQUAL "gcc46" OR EXPLODE_TOOLSET STREQUAL "gcc47" OR EXPLODE_TOOLSET STREQUAL "gcc49")
   config_compile_and_linker_flags_name (GPP GCC)
 elseif (EXPLODE_TOOLSET STREQUAL "vc80" OR EXPLODE_TOOLSET STREQUAL "vc90" OR EXPLODE_TOOLSET STREQUAL "vc11" OR EXPLODE_TOOLSET STREQUAL "vc10" OR EXPLODE_TOOLSET STREQUAL "vc12")
   config_compile_and_linker_flags_name (MSVC_CXX MSVC_CC)
@@ -406,6 +406,7 @@ elseif (EXPLODE_TOOLSET STREQUAL "clang")
 else ()
   message (FATAL_ERROR "Unknown compiler ${EXPLODE_TOOLSET}")
 endif ()
+
 
 set (cc_flags "${cc_flags} -DSOURCES_ROOT=${CMAKE_SOURCE_DIR}")
 set (cxx_flags "${cxx_flags} -DSOURCES_ROOT=${CMAKE_SOURCE_DIR}")
@@ -443,6 +444,11 @@ include_directories (${EXPLODE_SRC})
 set (CMAKE_CC_FLAGS "${cc_flags}")
 
 set (CMAKE_CXX_FLAGS "${cxx_flags}")
+
+if (EXPLODE_STATIC_BUILD)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILD_MZEXPLODE_AS_STATIC_LIB")
+  set (CMAKE_CC_FLAGS "${CMAKE_CXX_FLAGS} -DBUILD_MZEXPLODE_AS_STATIC_LIB")
+endif ()
 
 if (linker_flags)
   set (CMAKE_EXE_LINKER_FLAGS    "${linker_flags}")

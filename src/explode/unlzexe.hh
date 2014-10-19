@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include "explode/proper_export.hh"
 
 namespace explode
 {
@@ -10,7 +11,7 @@ namespace explode
   class output_exe_file;
   class input;
   
-  class unlzexe
+  class EXPLODE_API unlzexe
   {
   public:
     explicit unlzexe (input_exe_file& inp);

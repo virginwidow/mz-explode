@@ -20,4 +20,10 @@ set (hdr
   knowledge_dynamics.hh
 )
 
-add_library (explode STATIC ${src} ${hdr})
+if (EXPLODE_STATIC_BUILD)
+  add_library (explode STATIC ${src} ${hdr})
+else ()
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILD_MZEXPLODE_AS_SHARED_LIB")
+  set (CMAKE_CC_FLAGS  "${CMAKE_CC_FLAGS} -DBUILD_MZEXPLODE_AS_STATIC_LIB")
+  add_library (explode SHARED ${src} ${hdr})
+endif ()

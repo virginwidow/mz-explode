@@ -8,12 +8,13 @@
 
 #include <sys/types.h>
 
+#include "explode/proper_export.hh"
 
 namespace explode
 {
   typedef off_t offset_type;
 
-  class input
+  class EXPLODE_API input
   {
   public:
     input ();
@@ -43,7 +44,7 @@ namespace explode
 
   // ============================================================
 
-  class output
+  class EXPLODE_API output
   {
   public:
     output ();
@@ -72,7 +73,7 @@ namespace explode
 
   // ============================================================
 
-  class file_input : public input
+  class EXPLODE_API file_input : public input
   {
   public:
     explicit file_input (const char* path);
@@ -90,7 +91,7 @@ namespace explode
     FILE* m_file;
   };
   // ============================================================
-  class inmem_input : public input
+  class EXPLODE_API inmem_input : public input
   {
   public:
 	  inmem_input(const unsigned char* data, std::size_t size);
@@ -106,7 +107,7 @@ namespace explode
   };
 
   // ============================================================
-  class file_output : public output
+  class EXPLODE_API file_output : public output
   {
   public:
     explicit file_output (const char* path);
@@ -123,7 +124,7 @@ namespace explode
     FILE* m_file;
   };
   // ============================================================
-  class inmem_output : public output
+  class EXPLODE_API inmem_output : public output
   {
   public:
 	  explicit inmem_output(std::vector <char>& out_buff);

@@ -18,7 +18,7 @@ namespace explode
   public:
     input ();
     virtual ~input ();
-    virtual void read (char* buffer, std::size_t size) = 0;
+    virtual void read_buff (char* buffer, std::size_t size) = 0;
     virtual offset_type tell () = 0;
     virtual offset_type bytes_remains () = 0;
     virtual void seek (offset_type offset) = 0;
@@ -32,7 +32,7 @@ namespace explode
 	T*    words;
       } u;
       u.words = &x;
-      this->read (u.bytes, sizeof (T));
+      this->read_buff (u.bytes, sizeof (T));
     }
   
 
@@ -48,7 +48,7 @@ namespace explode
   public:
     output ();
     virtual ~output ();
-    virtual void write (const char* buffer, std::size_t size) = 0;
+    virtual void write_buff (const char* buffer, std::size_t size) = 0;
     virtual offset_type tell () = 0;
     virtual void seek (offset_type offset) = 0;
 
@@ -61,7 +61,7 @@ namespace explode
 		const T*    words;
       } u;
       u.words = &x;
-      write (u.bytes, sizeof (T));
+      write_buff (u.bytes, sizeof (T));
     }
 
 
@@ -80,7 +80,7 @@ namespace explode
 
     ~file_input ();
 
-    virtual void read (char* buffer, std::size_t size);
+    virtual void read_buff (char* buffer, std::size_t size);
     virtual offset_type tell ();
     virtual offset_type bytes_remains ();
     virtual void seek (offset_type offset);
@@ -95,7 +95,7 @@ namespace explode
   public:
 	  inmem_input(const unsigned char* data, std::size_t size);
 	  
-	  virtual void read(char* buffer, std::size_t size);
+	  virtual void read_buff (char* buffer, std::size_t size);
 	  virtual offset_type tell();
 	  virtual offset_type bytes_remains();
 	  virtual void seek(offset_type offset);
@@ -114,7 +114,7 @@ namespace explode
 
     ~file_output ();
 
-    virtual void write (const char* buffer, std::size_t size);
+    virtual void write_buff (const char* buffer, std::size_t size);
     virtual offset_type tell ();
     virtual void seek (offset_type offset);
 
@@ -128,7 +128,7 @@ namespace explode
   public:
 	  explicit inmem_output(std::vector <char>& out_buff);
 
-	  virtual void write(const char* buffer, std::size_t size);
+	  virtual void write_buff (const char* buffer, std::size_t size);
 	  virtual offset_type tell();
 	  virtual void seek(offset_type offset);
 

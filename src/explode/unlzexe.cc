@@ -25,7 +25,9 @@ static void build_rellocs_90 (explode::input& file, std::vector <explode::relloc
 	  rellocs.push_back (explode::rellocation (static_cast <uint16_t> (seg), offs));
 	}
       seg = static_cast <int16_t> (seg + 0x1000);
-    } while (seg != static_cast <int16_t>(0xF000+0x1000));
+    } // while (seg != static_cast <int16_t>(0xF000+0x1000));
+  while (seg);
+  //std::cout << "seg = " << std::hex << seg << std::endl;
 }
 // ----------------------------------------------------------------
 static void build_rellocs_91 (explode::input& file, std::vector <explode::rellocation>& rellocs)
@@ -150,7 +152,7 @@ namespace explode
     magic.word = 0;
 
     m_file.seek (magic_offs);
-    m_file.read (magic.bytes, 4);
+    m_file.read_buff (magic.bytes, 4);
 
     magic.word = byte_order::from_little_endian(magic.word);
 
@@ -177,7 +179,7 @@ namespace explode
       uint16_t* words;
     } u;
     u.words = m_header;
-    m_file.read (u.bytes, sizeof (m_header));
+    m_file.read_buff (u.bytes, sizeof (m_header));
 
     for (int i = 0; i < eHEADER_MAX; i++)
       {

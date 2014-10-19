@@ -60,7 +60,7 @@ namespace explode
       uint16_t* words;
     } u;
     u.words = m_header;
-    m_file.read (u.bytes, sizeof (uint16_t)*MAX_HEADER_VAL);
+    m_file.read_buff (u.bytes, sizeof (uint16_t)*MAX_HEADER_VAL);
     
     for (int i=0; i<MAX_HEADER_VAL; i++)
       {
@@ -84,7 +84,7 @@ namespace explode
       uint16_t words [2];
     } u;
 
-    m_file.read (u.bytes, 2*sizeof (uint16_t));
+    m_file.read_buff (u.bytes, 2*sizeof (uint16_t));
     
     u.words [0] = byte_order::from_little_endian (u.words [0]);
     u.words [1] = byte_order::from_little_endian (u.words [1]);
@@ -202,7 +202,7 @@ namespace explode
       }
     const offset_type entry = (static_cast <uint32_t>(m_header [HEADER_SIZE_PARA] + m_header [INITIAL_CS]) << 4) + m_header [INITIAL_IP];
     m_file.seek (entry);
-    m_file.read (reinterpret_cast <char*>(sigbuff), sizeof (sigbuff));
+    m_file.read_buff (reinterpret_cast <char*>(sigbuff), sizeof (sigbuff));
 	
     if (std::memcmp (sigbuff, sig90, sizeof (sig90)) == 0)
       {
@@ -235,7 +235,7 @@ namespace explode
 	offset_type exepack_hdr_start = exe_data_start + exe_len;
 	m_file.seek(exepack_hdr_start + 0x12 - 2);
 	char magic[2];
-	m_file.read(magic, 2);
+	m_file.read_buff(magic, 2);
 
 	const bool has_sig = (magic[0] == 'R' && magic[1] == 'B');
 	if (!has_sig)
@@ -245,7 +245,7 @@ namespace explode
 	const offset_type str_offs = exepack_hdr_start + 0x12 + 0x105; // exepack_hdr_start + unpk_len;
 	m_file.seek(str_offs);
 	char str[0x16];
-	m_file.read(str, sizeof(str));
+	m_file.read_buff(str, sizeof(str));
 	const int rc = std::memcmp (str, "Packed file is corrupt", 0x16);
 	res = (rc == 0);
       }
@@ -433,11 +433,11 @@ namespace explode
       const uint16_t* words;
     } h;
     h.words = new_header;
-    out.write (h.bytes, sizeof (m_header));
+    out.write_buff (h.bytes, sizeof (m_header));
 
     if (!m_extra_header.empty ())
       {
-	out.write (reinterpret_cast <const char*> (&m_extra_header [0]), m_extra_header.size ());
+	out.write_buff (reinterpret_cast <const char*> (&m_extra_header [0]), m_extra_header.size ());
       }
     if (!m_rellocs.empty())
       {
@@ -456,7 +456,7 @@ namespace explode
 	    new_rel[2*i+1] = seg;
 	  }
 	r.words = &new_rel[0];
-	out.write(r.bytes, relloc_entries * 4);
+	out.write_buff (r.bytes, relloc_entries * 4);
       }
     const std::size_t now = static_cast <std::size_t> (out.tell());
     if (now > para_size * 16)
@@ -467,10 +467,10 @@ namespace explode
     if (sz)
       {
 	std::vector <char> dummy (sz, 0);
-	out.write (&dummy[0], sz);
+	out.write_buff (&dummy[0], sz);
       }
 
-    out.write (reinterpret_cast <const char*>(&m_code[0]), m_code.size ());
+    out.write_buff (reinterpret_cast <const char*>(&m_code[0]), m_code.size ());
   }
 } // ns explode
 

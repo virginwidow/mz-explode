@@ -43,7 +43,7 @@ namespace explode
       }
   }
   // -------------------------------------------------------------
-  void file_input::read (char* buffer, std::size_t size)
+  void file_input::read_buff (char* buffer, std::size_t size)
   {
     if (fread (buffer, size, 1, m_file) != 1)
       {
@@ -88,7 +88,7 @@ namespace explode
   {
   }
   // -------------------------------------------------------------
-  void inmem_input::read(char* buffer, std::size_t size)
+  void inmem_input::read_buff (char* buffer, std::size_t size)
   {
 	  if (m_ptr + size > m_size)
 	  {
@@ -149,7 +149,7 @@ namespace explode
       }
   }
   // -------------------------------------------------------------
-  void file_output::write (const char* buffer, std::size_t size)
+  void file_output::write_buff (const char* buffer, std::size_t size)
   {
     if (fwrite (buffer, size, 1, m_file) != 1)
       {
@@ -182,7 +182,7 @@ namespace explode
 
   }
   // -------------------------------------------------------------
-  void inmem_output::write(const char* buffer, std::size_t size)
+  void inmem_output::write_buff (const char* buffer, std::size_t size)
   {
 	  if (m_ptr + size >= m_buff.size())
 	  {

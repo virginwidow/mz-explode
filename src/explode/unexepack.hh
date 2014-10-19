@@ -41,7 +41,7 @@ namespace explode
 		uint32_t m_exe_data_start;
 		uint32_t m_extra_data_start;
 		uint32_t m_packed_data_len;
-
+		uint32_t m_rellocs_start;
 	};
 } // ns explode
 

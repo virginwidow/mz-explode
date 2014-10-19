@@ -72,11 +72,11 @@ static void dump_extra(const explode::exe_file& header, const char* ofile, explo
 	const std::size_t sz = static_cast <std::size_t> (rellocs_offset - end_of_header);
 	input.seek(end_of_header);
 	std::vector <char> extra(sz);
-	input.read(&extra [0], sz);
+	input.read_buff (&extra [0], sz);
 	explode::file_output output(ofile);
 	if (!extra.empty ())
 	  {
-	    output.write(&extra[0], extra.size());
+	    output.write_buff (&extra[0], extra.size());
 	  }
 	std::cout << "Extra information has been saved to " << ofile << " (" << sz << " bytes)" << std::endl;
 }
@@ -101,7 +101,7 @@ static void load_rellocs(const explode::exe_file& header, explode::input& input,
 	{
 		input.seek(rellocs_offset);
 		out.resize(sz);
-		input.read(&out[0], sz);
+		input.read_buff (&out[0], sz);
 	}
 }
 // --------------------------------------------------------------------
@@ -111,7 +111,7 @@ static void dump_rellocs(const explode::exe_file& header, const char* ofile, exp
 	load_rellocs(header, input, rels);
 	explode::file_output output(ofile);
 
-	output.write(&rels[0], rels.size ());
+	output.write_buff (&rels[0], rels.size ());
 	std::cout << "Rellocations has been saved to " << ofile << " (" << rels.size () << " bytes)" << std::endl;
 }
 // --------------------------------------------------------------------
@@ -197,7 +197,7 @@ static void load_code(const explode::exe_file& header, explode::input& input, st
 	input.seek(end_of_mz_header);
 	const std::size_t sz = static_cast <std::size_t> (input.bytes_remains());
 	out.resize(sz);
-	input.read(&out[0], sz);
+	input.read_buff(&out[0], sz);
 }
 // --------------------------------------------------------------------
 static void dump_code(const explode::exe_file& header, const char* ofile, explode::input& input)
@@ -205,7 +205,7 @@ static void dump_code(const explode::exe_file& header, const char* ofile, explod
 	std::vector <char> code;
 	load_code(header, input, code);
 	explode::file_output output(ofile);
-	output.write(&code[0], code.size ());
+	output.write_buff(&code[0], code.size ());
 	std::cout << "Code has been saved to " << ofile << " (" << code.size () << " bytes)" << std::endl;
 }
 // --------------------------------------------------------------------

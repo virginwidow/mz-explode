@@ -81,7 +81,6 @@ namespace explode
 #endif
 #else
 #define fseek_offset fseek
-#error ZOPA
 #endif
 
   void file_input::seek (offset_type offset)

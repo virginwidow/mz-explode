@@ -15,6 +15,7 @@ static void build_rellocs_90 (explode::input& file, std::vector <explode::relloc
     {
       uint16_t t;
       file.read (t);
+	  t = explode::byte_order::from_little_endian(t);
       int c = t & 0xFFFF;
 
       for (; c>0; c--)
@@ -43,6 +44,7 @@ static void build_rellocs_91 (explode::input& file, std::vector <explode::relloc
       if (span == 0)
 	{
 	  file.read(span);
+	  span = explode::byte_order::from_little_endian(span);
 	  if (span == 0)
 	    {
 	      seg = static_cast <int16_t>(seg + 0x0FFF);
@@ -154,7 +156,6 @@ namespace explode
     m_file.seek (magic_offs);
     m_file.read_buff (magic.bytes, 4);
 
-    magic.word = byte_order::from_little_endian(magic.word);
 
     if (std::memcmp (magic.bytes, "LZ09", 4) == 0)
       {

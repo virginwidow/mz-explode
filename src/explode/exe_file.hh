@@ -104,8 +104,15 @@ namespace explode
     output_exe_file (const output_exe_file&);
     output_exe_file& operator = (const output_exe_file&);
   protected:
+#if defined(_MSC_VER)
+#pragma warning (push)
+#pragma warning (disable:4251)
+#endif
     rellocations_t m_rellocs;
     std::vector <uint8_t> m_extra_header;
+#if defined(_MSC_VER)
+#pragma warning (pop)
+#endif
     bool m_set [MAX_HEADER_VAL];
   };
   // ====================================================================
@@ -126,7 +133,14 @@ namespace explode
     
     virtual void write (output& out) const;
   private:
+#if defined(_MSC_VER)
+#pragma warning (push)
+#pragma warning (disable:4251)
+#endif
     std::vector <uint8_t> m_code;
+#if defined(_MSC_VER)
+#pragma warning (pop)
+#endif
     std::size_t m_real_size;
   };
 } // ns explode

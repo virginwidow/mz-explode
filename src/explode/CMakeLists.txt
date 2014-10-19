@@ -18,6 +18,7 @@ set (hdr
   struct_reader.hh
   unexepack.hh
   knowledge_dynamics.hh
+  proper_export.hh
 )
 
 if (EXPLODE_STATIC_BUILD)

@@ -5,6 +5,11 @@
 
 #include "explode/proper_export.hh"
 
+#if defined(_MSC_VER)
+#pragma warning (push)
+#pragma warning (disable:4275)
+#endif
+
 namespace explode
 {
   class EXPLODE_API input_error : public std::runtime_error
@@ -28,5 +33,9 @@ namespace explode
     ~decoder_error () throw ();
   };
 } // ns explode
+
+#if defined(_MSC_VER)
+#pragma warning (pop)
+#endif
 
 #endif

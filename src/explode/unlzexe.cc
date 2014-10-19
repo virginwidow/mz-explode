@@ -10,19 +10,16 @@
 
 static void build_rellocs_90 (explode::input& file, std::vector <explode::rellocation>& rellocs)
 {
+	explode::byte_reader f(file);
   int16_t seg = 0;
   do
     {
-      uint16_t t;
-      file.read (t);
-	  t = explode::byte_order::from_little_endian(t);
+	  uint16_t t = f.word();
       int c = t & 0xFFFF;
 
       for (; c>0; c--)
 	{
-	  uint16_t offs;
-	  file.read (offs);
-	  offs = explode::byte_order::from_little_endian(offs);
+	  uint16_t offs = f.word ();
 	  rellocs.push_back (explode::rellocation (static_cast <uint16_t> (seg), offs));
 	}
       seg = static_cast <int16_t> (seg + 0x1000);
@@ -36,15 +33,14 @@ static void build_rellocs_91 (explode::input& file, std::vector <explode::relloc
   int16_t seg  = 0;
   int16_t offs = 0;
   int16_t span = 0;
+  explode::byte_reader f(file);
   while (true)
     {
-      uint8_t s;
-      file.read (s);
+      uint8_t s = f.byte ();
       span = static_cast <int16_t> (static_cast <uint16_t> (s) & 0xFF);
       if (span == 0)
 	{
-	  file.read(span);
-	  span = explode::byte_order::from_little_endian(span);
+	  span = f.word ();
 	  if (span == 0)
 	    {
 	      seg = static_cast <int16_t>(seg + 0x0FFF);

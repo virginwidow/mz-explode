@@ -98,7 +98,22 @@ namespace explode
 				throw decoder_error("not an exepack");
 			}
 
-			int x = 0;
+			uint16_t ax = var_36;
+			ax += 6;
+			
+			uint32_t uncompressed_size = ((uint32_t)u.words[ax] & 0xFFFF) << 4;
+			uint32_t var_8 = ((uint32_t)inp[exe_file::INITIAL_CS] & 0xFFFF) << 4;
+			uint32_t offs = ((uint32_t)inp[exe_file::HEADER_SIZE_PARA] & 0xFFFF) << 4;
+			
+			m_file.seek(offs);
+			std::vector <uint8_t> ibuff(var_8);
+			m_file.read_buff((char*)&ibuff[0], var_8);
+			
+			uint16_t bytes_in = var_8;
+
+			
+
+
 		}
 		// goto 107f5
 		
